@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaction Time Tester (Three Arrows)</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+        }
+        #startButton, #arrow {
+            font-size: 20px;
+            padding: 10px;
+            cursor: pointer;
+            margin: 20px;
+        }
+        #arrow {
+            display: none;
+            position: absolute;
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Reaction Time Tester</h1>
+    <button id="startButton">Start</button>
+    <div id="arrow">⬆️</div>
+    <p id="result"></p>
+
+    <script>
+        let startTime, arrow, resultText;
+        let reactionTimes = [];
+        let arrowCount = 0; // Track which arrow we're on
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const startButton = document.getElementById("startButton");
+            arrow = document.getElementById("arrow");
+            resultText = document.getElementById("result");
+
+            startButton.addEventListener("click", () => {
+                reactionTimes = [];
+                arrowCount = 0;
+                arrow.style.display = "none";
+                resultText.textContent = "";
+                spawnArrow();
+            });
+
+            arrow.addEventListener("click", () => {
+                let reactionTime = Date.now() - startTime;
+                reactionTimes.push(reactionTime);
+                
+                if (reactionTimes.length < 3) {
+                    spawnArrow(); // Show next arrow
+                } else {
+                    displayResults(); // Show results after 3 clicks
+                }
+            });
+        });
+
+        function spawnArrow() {
+            arrow.style.display = "none"; // Hide arrow before next spawn
+            let delay = Math.random() * 2000 + 1000; // 1-3 sec delay
+
+            setTimeout(() => {
+                let x = Math.random() * (window.innerWidth - 50);
+                let y = Math.random() * (window.innerHeight - 50);
+                
+                arrow.style.left = `${x}px`;
+                arrow.style.top = `${y}px`;
+                arrow.style.display = "block";
+
+                startTime = Date.now(); // Start the reaction timer
+            }, delay);
+        }
+
+        function displayResults() {
+            arrow.style.display = "none"; // Hide arrow at the end
+            resultText.innerHTML = `
+                <strong>Reaction Times:</strong><br>
+                First: ${reactionTimes[0]} ms<br>
+                Second: ${reactionTimes[1]} ms<br>
+                Third: ${reactionTimes[2]} ms
+            `;
+        }
+    </script>
+
+</body>
+</html>
