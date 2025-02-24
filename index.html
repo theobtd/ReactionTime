@@ -8,19 +8,26 @@
         body {
             text-align: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f4; /* Light background for a lab-like feel */
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         h1 {
             font-size: 2.5em;
             color: #333;
-            margin-bottom: 20px;
+            margin: 0;
+            position: fixed; /* Fixing the title to the top */
+            top: 20px; /* Slight margin from the top */
+            left: 50%;
+            transform: translateX(-50%); /* Center the title horizontally */
+            z-index: 10; /* Ensures the title is above other elements */
         }
 
         button {
@@ -29,14 +36,14 @@
             cursor: pointer;
             margin: 15px;
             border-radius: 5px;
-            background-color: #007bff; /* Professional, lab-like blue */
+            background-color: #007bff;
             color: white;
             border: none;
             transition: background-color 0.3s;
         }
 
         button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #0056b3;
         }
 
         #countdown {
@@ -46,30 +53,34 @@
         }
 
         #progressBarContainer {
-            width: 60%;
+            width: 80%;
             height: 15px;
-            background-color: #e0e0e0; /* Soft grey background */
-            margin: 30px auto;
+            background-color: #e0e0e0;
+            position: fixed;
+            bottom: 20px; /* Fixed at the bottom */
+            left: 50%;
+            transform: translateX(-50%); /* Center the progress bar horizontally */
             border-radius: 10px;
             overflow: hidden;
+            z-index: 5; /* Ensures it stays above other elements */
         }
 
         #progressBar {
             height: 100%;
             width: 0%;
-            background-color: #4CAF50; /* Calming green for progress */
+            background-color: #4CAF50;
             border-radius: 10px;
         }
 
         #arrowContainer {
-            font-size: 50px;
-            margin-top: 50px;
+            font-size: 166px; /* Decreased the arrow size by 1.5 times */
+            margin-top: 80px; /* Add space below the fixed title */
             display: none;
         }
 
         .arrow {
-            padding: 10px;
-            color: #333; /* Dark color for arrows */
+            padding: 7px; /* Reduced padding by 30% to bring arrows closer */
+            color: #333;
         }
 
         #result {
@@ -83,16 +94,31 @@
             display: none;
             font-size: 18px;
             padding: 12px 24px;
-            background-color: #28a745; /* Green button for restart */
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 20px;
         }
 
         #restartButton:hover {
-            background-color: #218838; /* Darker green on hover */
+            background-color: #218838;
         }
+
+        /* Instructions screen styling */
+        #instructionsScreen {
+            display: none;
+            font-size: 20px;
+            color: #333;
+            margin-top: 50px;
+        }
+
+        #understoodButton {
+            background-color: #28a745;
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
@@ -101,12 +127,20 @@
         <h1>Flanker Task</h1>
         <button id="startButton">Start Test</button>
         <div id="countdown"></div>
-        <div id="progressBarContainer">
-            <div id="progressBar"></div>
-        </div>
         <div id="arrowContainer"></div>
         <p id="result"></p>
         <button id="restartButton">Restart</button>
+    </div>
+    
+    <div id="progressBarContainer">
+        <div id="progressBar"></div>
+    </div>
+
+    <!-- Instructions Screen -->
+    <div id="instructionsScreen">
+        <p>INSTRUCTIONS</p>
+        <p>In this task, you'll see arrows on the screen. Your job is to identify the direction of the center arrow and ignore the surrounding arrows. Press the left arrow key if the center arrow points left, and the right arrow key if it points right.</p>
+        <button id="understoodButton">Understood</button>
     </div>
 
     <script>
@@ -116,15 +150,18 @@
         let reactionTimes = { congruent: 0, incongruent: 0 };
         let wrongGuesses = 0;
 
-        document.getElementById("startButton").addEventListener("click", startCountdown);
+        document.getElementById("startButton").addEventListener("click", showInstructions);
         document.getElementById("restartButton").addEventListener("click", startCountdown);
+        document.getElementById("understoodButton").addEventListener("click", startCountdown);
+
+        function showInstructions() {
+            document.getElementById("startButton").style.display = "none"; 
+            document.getElementById("instructionsScreen").style.display = "block"; 
+        }
 
         function startCountdown() {
-            document.getElementById("startButton").style.display = "none"; 
-            document.getElementById("restartButton").style.display = "none"; 
-            document.getElementById("result").textContent = "";
+            document.getElementById("instructionsScreen").style.display = "none";
             document.getElementById("countdown").style.display = "block";
-            document.getElementById("progressBarContainer").style.display = "none";
             document.getElementById("countdown").textContent = "Starting in 5...";
 
             let count = 5;
@@ -141,7 +178,6 @@
 
         function startTest() {
             document.getElementById("arrowContainer").style.display = "block";
-            document.getElementById("progressBarContainer").style.display = "block";
             trials = generateTrials();
             currentTrial = 0;
             reactionTimes = { congruent: 0, incongruent: 0 };
@@ -226,7 +262,6 @@
 
         function endTest() {
             document.getElementById("arrowContainer").style.display = "none";
-            document.getElementById("progressBarContainer").style.display = "none";
             document.getElementById("result").innerHTML = 
                 `<strong>Results:</strong><br>
                 Total Reaction Time (Congruent): ${reactionTimes.congruent} ms<br>
