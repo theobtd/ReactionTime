@@ -3,87 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reaction Time Tester (Three Arrows)</title>
+    <title>Flanker Test</title>
     <style>
         body {
             text-align: center;
-            font-family: Arial, sans-serif;
-            margin-top: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4; /* Light background for a lab-like feel */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        #startButton, #arrow {
-            font-size: 20px;
-            padding: 10px;
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 12px 24px;
             cursor: pointer;
-            margin: 20px;
+            margin: 15px;
+            border-radius: 5px;
+            background-color: #007bff; /* Professional, lab-like blue */
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
         }
-        #arrow {
-            display: none;
-            position: absolute;
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        #countdown {
+            font-size: 40px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        #progressBarContainer {
+            width: 60%;
+            height: 15px;
+            background-color: #e0e0e0; /* Soft grey background */
+            margin: 30px auto;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50; /* Calming green for progress */
+            border-radius: 10px;
+        }
+
+        #arrowContainer {
             font-size: 50px;
+            margin-top: 50px;
+            display: none;
+        }
+
+        .arrow {
+            padding: 10px;
+            color: #333; /* Dark color for arrows */
+        }
+
+        #result {
+            font-size: 1.2em;
+            margin-top: 30px;
+            color: #333;
+            display: none;
+        }
+
+        #restartButton {
+            display: none;
+            font-size: 18px;
+            padding: 12px 24px;
+            background-color: #28a745; /* Green button for restart */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #restartButton:hover {
+            background-color: #218838; /* Darker green on hover */
         }
     </style>
 </head>
 <body>
 
-    <h1>Reaction Time Tester</h1>
-    <button id="startButton">Start</button>
-    <div id="arrow">⬆️</div>
-    <p id="result"></p>
+    <div>
+        <h1>Flanker Task</h1>
+        <button id="startButton">Start Test</button>
+        <div id="countdown"></div>
+        <div id="progressBarContainer">
+            <div id="progressBar"></div>
+        </div>
+        <div id="arrowContainer"></div>
+        <p id="result"></p>
+        <button id="restartButton">Restart</button>
+    </div>
 
     <script>
-        let startTime, arrow, resultText;
-        let reactionTimes = [];
-        let arrowCount = 0; // Track which arrow we're on
+        let trials = [];
+        let currentTrial = 0;
+        let startTime;
+        let reactionTimes = { congruent: 0, incongruent: 0 };
+        let wrongGuesses = 0;
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const startButton = document.getElementById("startButton");
-            arrow = document.getElementById("arrow");
-            resultText = document.getElementById("result");
+        document.getElementById("startButton").addEventListener("click", startCountdown);
+        document.getElementById("restartButton").addEventListener("click", startCountdown);
 
-            startButton.addEventListener("click", () => {
-                reactionTimes = [];
-                arrowCount = 0;
-                arrow.style.display = "none";
-                resultText.textContent = "";
-                spawnArrow();
-            });
+        function startCountdown() {
+            document.getElementById("startButton").style.display = "none"; 
+            document.getElementById("restartButton").style.display = "none"; 
+            document.getElementById("result").textContent = "";
+            document.getElementById("countdown").style.display = "block";
+            document.getElementById("progressBarContainer").style.display = "none";
+            document.getElementById("countdown").textContent = "Starting in 5...";
 
-            arrow.addEventListener("click", () => {
-                let reactionTime = Date.now() - startTime;
-                reactionTimes.push(reactionTime);
-                
-                if (reactionTimes.length < 3) {
-                    spawnArrow(); // Show next arrow
-                } else {
-                    displayResults(); // Show results after 3 clicks
+            let count = 5;
+            let countdownInterval = setInterval(() => {
+                count--;
+                document.getElementById("countdown").textContent = `Starting in ${count}...`;
+                if (count === 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById("countdown").style.display = "none";
+                    startTest();
                 }
-            });
-        });
+            }, 1000);
+        }
 
-        function spawnArrow() {
-            arrow.style.display = "none"; // Hide arrow before next spawn
-            let delay = Math.random() * 2000 + 1000; // 1-3 sec delay
+        function startTest() {
+            document.getElementById("arrowContainer").style.display = "block";
+            document.getElementById("progressBarContainer").style.display = "block";
+            trials = generateTrials();
+            currentTrial = 0;
+            reactionTimes = { congruent: 0, incongruent: 0 };
+            wrongGuesses = 0;
+            runTrial();
+        }
+
+        function generateTrials() {
+            let trialCount = 20;
+            let trialsArray = [];
+            for (let i = 0; i < trialCount; i++) {
+                trialsArray.push(i % 2 === 0);
+            }
+            return trialsArray.sort(() => Math.random() - 0.5);
+        }
+
+        function runTrial() {
+            if (currentTrial >= trials.length) {
+                endTest();
+                return;
+            }
+
+            let isCongruent = trials[currentTrial];
+            let targetDirection = Math.random() < 0.5 ? "←" : "→";
+            let flankerDirection = isCongruent ? targetDirection : (targetDirection === "←" ? "→" : "←");
+
+            let arrowRow = 
+                `<span class="arrow">${flankerDirection}</span>
+                <span class="arrow">${flankerDirection}</span>
+                <span class="arrow">${targetDirection}</span>
+                <span class="arrow">${flankerDirection}</span>
+                <span class="arrow">${flankerDirection}</span>`;
+
+            document.getElementById("arrowContainer").innerHTML = "";
+            let delay = Math.floor(Math.random() * (1500 - 500 + 1)) + 500;
 
             setTimeout(() => {
-                let x = Math.random() * (window.innerWidth - 50);
-                let y = Math.random() * (window.innerHeight - 50);
-                
-                arrow.style.left = `${x}px`;
-                arrow.style.top = `${y}px`;
-                arrow.style.display = "block";
+                document.getElementById("arrowContainer").innerHTML = arrowRow;
+                startTime = Date.now();
 
-                startTime = Date.now(); // Start the reaction timer
+                let timeout = setTimeout(() => {
+                    document.removeEventListener("keydown", keyPressHandler);
+                    document.getElementById("arrowContainer").innerHTML = "";
+                    currentTrial++;
+                    updateProgressBar();
+                    runTrial();
+                }, 1700);
+
+                function keyPressHandler(event) {
+                    if ((targetDirection === "←" && event.key === "ArrowLeft") || (targetDirection === "→" && event.key === "ArrowRight")) {
+                        let reactionTime = Date.now() - startTime;
+                        if (isCongruent) {
+                            reactionTimes.congruent += reactionTime;
+                        } else {
+                            reactionTimes.incongruent += reactionTime;
+                        }
+                        clearTimeout(timeout);
+                        document.removeEventListener("keydown", keyPressHandler);
+                        document.getElementById("arrowContainer").innerHTML = "";
+                        currentTrial++;
+                        updateProgressBar();
+                        runTrial();
+                    } else {
+                        wrongGuesses++;
+                        clearTimeout(timeout);
+                        document.removeEventListener("keydown", keyPressHandler);
+                        document.getElementById("arrowContainer").innerHTML = "";
+                        currentTrial++;
+                        updateProgressBar();
+                        runTrial();
+                    }
+                }
+
+                document.addEventListener("keydown", keyPressHandler);
             }, delay);
         }
 
-        function displayResults() {
-            arrow.style.display = "none"; // Hide arrow at the end
-            resultText.innerHTML = `
-                <strong>Reaction Times:</strong><br>
-                First: ${reactionTimes[0]} ms<br>
-                Second: ${reactionTimes[1]} ms<br>
-                Third: ${reactionTimes[2]} ms
-            `;
+        function updateProgressBar() {
+            let progress = ((currentTrial / trials.length) * 100);
+            document.getElementById("progressBar").style.width = progress + "%";
+        }
+
+        function endTest() {
+            document.getElementById("arrowContainer").style.display = "none";
+            document.getElementById("progressBarContainer").style.display = "none";
+            document.getElementById("result").innerHTML = 
+                `<strong>Results:</strong><br>
+                Total Reaction Time (Congruent): ${reactionTimes.congruent} ms<br>
+                Total Reaction Time (Incongruent): ${reactionTimes.incongruent} ms<br>
+                Total Wrong Guesses: ${wrongGuesses}`;
+            document.getElementById("result").style.display = "block";
+            document.getElementById("restartButton").style.display = "block";
         }
     </script>
 
