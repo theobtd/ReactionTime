@@ -97,6 +97,7 @@
         let reactionTimes = { congruent: 0, incongruent: 0 };
         let wrongGuesses = 0;
         let alertingReactionTimes = [];
+        let spacebarPressCount = 0;  // Counter for spacebar presses
 
         document.getElementById("startButton").addEventListener("click", showInstructions);
         document.getElementById("restartButton").addEventListener("click", resetTest);
@@ -106,6 +107,7 @@
         function resetTest() {
             document.getElementById("result").style.display = "none";
             document.getElementById("restartButton").style.display = "none";
+            spacebarPressCount = 0;  // Reset spacebar press counter
             showInstructions();
         }
 
@@ -177,7 +179,16 @@
             document.getElementById("alertingInstructionsScreen").style.display = "none";
             document.getElementById("alertingTestScreen").style.display = "block";
 
+            // Start listening for spacebar presses immediately, not only when the dot is visible
+            document.addEventListener("keydown", spacebarHandler);
+
             runMultipleAlertingTests(0);
+        }
+
+        function spacebarHandler(event) {
+            if (event.key === " ") {
+                spacebarPressCount++;  // Increment spacebar press count at any time during the alerting test
+            }
         }
 
         function runMultipleAlertingTests(testIndex) {
@@ -192,16 +203,16 @@
                 document.getElementById("alertingStimulus").style.display = "block";
                 let startTime = Date.now();
 
-                function spacebarHandler(event) {
+                function spacebarTestHandler(event) {
                     if (event.key === " ") {
                         let reactionTime = Date.now() - startTime;
                         alertingReactionTimes.push(reactionTime);
-                        document.removeEventListener("keydown", spacebarHandler);
+                        document.removeEventListener("keydown", spacebarTestHandler);
                         document.getElementById("alertingStimulus").style.display = "none";
                         runMultipleAlertingTests(testIndex + 1);
                     }
                 }
-                document.addEventListener("keydown", spacebarHandler);
+                document.addEventListener("keydown", spacebarTestHandler);
             }, delay);
         }
 
@@ -216,7 +227,9 @@
                 Total Wrong Guesses: ${wrongGuesses}<br>
                 <strong>Alerting Test Reaction Times:</strong><br>
                 Total: ${totalAlertingReactionTime} ms<br>
-                Average: ${averageAlertingReactionTime.toFixed(2)} ms`;
+                Average: ${averageAlertingReactionTime.toFixed(2)} ms<br>
+                <strong>Total Spacebar Presses during Alerting Test:</strong><br>
+                ${spacebarPressCount}`;  // Display the spacebar press count
             document.getElementById("result").style.display = "block";
             document.getElementById("restartButton").style.display = "block";
         }
