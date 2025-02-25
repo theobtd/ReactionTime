@@ -15,22 +15,6 @@
             height: 100vh;
             flex-direction: column;
             overflow: hidden;
-            margin: 0;
-            padding-top: 50px; /* Add space for the fixed title */
-        }
-        /* Title fixed at the top */
-        h1 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #f4f4f4;
-            color: #333;
-            padding: 10px 0;
-            margin: 0;
-            font-size: 24px;
-            text-align: center;
-            z-index: 10;
         }
         button {
             font-size: 18px;
@@ -57,24 +41,28 @@
             font-size: 50px;
             display: none;
         }
-        /* Progress bar styling */
         #progressBarContainer {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             background-color: #ddd;
-            height: 10px;
         }
         #progressBar {
-            width: 0%;
-            height: 100%;
-            background-color: #007bff;
+            height: 10px;
+            background-color: #4caf50;
+            width: 0;
+        }
+        h1 {
+            position: fixed;
+            top: 20px;
+            width: 100%;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1>Flanker Task</h1> <!-- Fixed title -->
+    <h1>Flanker Task</h1>
     <button id="startButton">Start Test</button>
     <div id="arrowContainer"></div>
     <p id="result"></p>
@@ -99,7 +87,6 @@
         <p id="alertingStimulus">●</p>
     </div>
 
-    <!-- Progress Bar -->
     <div id="progressBarContainer">
         <div id="progressBar"></div>
     </div>
@@ -109,10 +96,7 @@
         let currentTrial = 0;
         let reactionTimes = { congruent: 0, incongruent: 0 };
         let wrongGuesses = 0;
-        let alertingReactionTime = 0;
-
-        const totalFlankerTrials = 21; // Number of trials in the flanker test
-        const totalTestSteps = totalFlankerTrials + 1; // Adding 1 step for the alerting test
+        let alertingReactionTimes = [];
 
         document.getElementById("startButton").addEventListener("click", showInstructions);
         document.getElementById("restartButton").addEventListener("click", resetTest);
@@ -141,28 +125,18 @@
         }
 
         function generateTrials() {
-            let trialsArray = Array(totalFlankerTrials).fill(true).map((_, i) => i % 2 === 0); // Start with alternating congruent/incongruent trials
-            // Shuffle initially
-            trialsArray = trialsArray.sort(() => Math.random() - 0.5);
-
-            // Ensure no consecutive trials have the same direction
-            for (let i = 1; i < trialsArray.length; i++) {
-                if (trialsArray[i] === trialsArray[i - 1]) {
-                    // If the current trial is the same as the previous one, change it to the opposite
-                    trialsArray[i] = trialsArray[i] === true ? false : true;
-                }
-            }
-
-            return trialsArray;
+            let trialsArray = Array(20).fill(true).map((_, i) => i % 2 === 0);
+            return trialsArray.sort(() => Math.random() - 0.5);
         }
 
         function runTrial() {
             if (currentTrial >= trials.length) {
-                // Flanker test completed, update progress bar and start alerting test
-                updateProgressBarFlankerTest();
                 endTest();
                 return;
             }
+
+            // Ensure the arrows are visible at the start of the trial
+            document.getElementById("arrowContainer").style.display = "block";
 
             let isCongruent = trials[currentTrial];
             let targetDirection = Math.random() < 0.5 ? "←" : "→";
@@ -172,6 +146,9 @@
             let startTime = Date.now();
 
             function keyPressHandler(event) {
+                // Hide arrows immediately after the answer
+                document.getElementById("arrowContainer").style.display = "none";
+
                 if ((targetDirection === "←" && event.key === "ArrowLeft") || (targetDirection === "→" && event.key === "ArrowRight")) {
                     let reactionTime = Date.now() - startTime;
                     isCongruent ? reactionTimes.congruent += reactionTime : reactionTimes.incongruent += reactionTime;
@@ -179,22 +156,16 @@
                     wrongGuesses++;
                 }
                 document.removeEventListener("keydown", keyPressHandler);
-                currentTrial++;
-                updateProgressBarFlankerTest();
-                runTrial();
+
+                // Random delay before the next trial (between 250ms and 1000ms)
+                let delay = Math.floor(Math.random() * (1000 - 250 + 1)) + 250;
+                setTimeout(() => {
+                    currentTrial++;
+                    updateProgressBar();
+                    runTrial(); // Start the next trial after the delay
+                }, delay);
             }
             document.addEventListener("keydown", keyPressHandler);
-        }
-
-        function updateProgressBarFlankerTest() {
-            // Update progress for the flanker test trials
-            const progress = ((currentTrial) / totalFlankerTrials) * 95; // Use 95% for flanker trials
-            document.getElementById("progressBar").style.width = progress + "%";
-        }
-
-        function updateProgressBarAfterAlertingTest() {
-            // Set progress to 100% after alerting test
-            document.getElementById("progressBar").style.width = "100%";
         }
 
         function endTest() {
@@ -206,40 +177,53 @@
             document.getElementById("alertingInstructionsScreen").style.display = "none";
             document.getElementById("alertingTestScreen").style.display = "block";
 
-            let delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000; // Random delay between 1 to 3 seconds
+            runMultipleAlertingTests(0);
+        }
 
-            // Hide the stimulus initially
-            document.getElementById("alertingStimulus").style.display = "none";
+        function runMultipleAlertingTests(testIndex) {
+            if (testIndex >= 5) {
+                document.getElementById("alertingTestScreen").style.display = "none";
+                showResults();
+                return;
+            }
 
-            // Set a timeout for when the dot should appear
+            let delay = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
             setTimeout(() => {
-                document.getElementById("alertingStimulus").style.display = "block"; // Show the dot
-                let startTime = Date.now(); // Record the time when the dot appears
+                document.getElementById("alertingStimulus").style.display = "block";
+                let startTime = Date.now();
 
-                // Define the spacebar handler that will be triggered when the user presses the spacebar
                 function spacebarHandler(event) {
                     if (event.key === " ") {
-                        alertingReactionTime = Date.now() - startTime; // Calculate reaction time
-                        document.removeEventListener("keydown", spacebarHandler); // Remove event listener
-                        document.getElementById("alertingTestScreen").style.display = "none"; // Hide alerting test screen
-                        updateProgressBarAfterAlertingTest(); // Set progress to 100% after alerting test
-                        showResults(); // Show results after spacebar press
+                        let reactionTime = Date.now() - startTime;
+                        alertingReactionTimes.push(reactionTime);
+                        document.removeEventListener("keydown", spacebarHandler);
+                        document.getElementById("alertingStimulus").style.display = "none";
+                        runMultipleAlertingTests(testIndex + 1);
                     }
                 }
-
-                document.addEventListener("keydown", spacebarHandler); // Listen for spacebar press
+                document.addEventListener("keydown", spacebarHandler);
             }, delay);
         }
 
         function showResults() {
-            document.getElementById("result").innerHTML = ` 
+            let totalAlertingReactionTime = alertingReactionTimes.reduce((acc, time) => acc + time, 0);
+            let averageAlertingReactionTime = totalAlertingReactionTime / alertingReactionTimes.length;
+
+            document.getElementById("result").innerHTML = `  
                 <strong>Results:</strong><br>
                 Total Reaction Time (Congruent): ${reactionTimes.congruent} ms<br>
                 Total Reaction Time (Incongruent): ${reactionTimes.incongruent} ms<br>
                 Total Wrong Guesses: ${wrongGuesses}<br>
-                <strong>Alerting Test Reaction Time:</strong> ${alertingReactionTime} ms`;
+                <strong>Alerting Test Reaction Times:</strong><br>
+                Total: ${totalAlertingReactionTime} ms<br>
+                Average: ${averageAlertingReactionTime.toFixed(2)} ms`;
             document.getElementById("result").style.display = "block";
             document.getElementById("restartButton").style.display = "block";
+        }
+
+        function updateProgressBar() {
+            let progress = ((currentTrial + 1) / trials.length) * 100;
+            document.getElementById("progressBar").style.width = `${progress}%`;
         }
     </script>
 </body>
