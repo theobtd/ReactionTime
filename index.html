@@ -107,6 +107,8 @@
         let spacebarPressCount = 0;
         let currentPhase = "flanker"; // Keep track of the current phase of the test (flanker, reversed, alerting)
         let currentFlankerType = "normal"; // Track whether we are in the normal or reversed flanker phase
+        let totalCompletedTrials = 0; // Track total completed trials for progress bar
+        const TOTAL_TRIALS = 25; // 10 normal flanker + 10 reversed flanker + 5 alerting = 25 total trials
 
         document.getElementById("startButton").addEventListener("click", showInstructions);
         document.getElementById("restartButton").addEventListener("click", resetTest);
@@ -119,6 +121,8 @@
             document.getElementById("restartButton").style.display = "none";
             spacebarPressCount = 0;
             wrongGuesses = { normal: 0, reversed: 0 };
+            totalCompletedTrials = 0;
+            updateProgressBar();
             showInstructions();
         }
 
@@ -167,25 +171,14 @@
 
                 if ((targetDirection === "←" && event.key === "ArrowLeft") || (targetDirection === "→" && event.key === "ArrowRight")) {
                     // Correct response
-                    if (currentFlankerType === "normal") {
-                        if (isCongruent) {
-                            reactionTimes.normal.congruent.push(Date.now() - startTime);
-                        } else {
-                            reactionTimes.normal.incongruent.push(Date.now() - startTime);
-                        }
+                    if (isCongruent) {
+                        reactionTimes.normal.congruent.push(Date.now() - startTime);
                     } else {
-                        // For reversed, the correct response is the opposite direction
-                        if ((targetDirection === "←" && event.key === "ArrowRight") || (targetDirection === "→" && event.key === "ArrowLeft")) {
-                            if (isCongruent) {
-                                reactionTimes.reversed.congruent.push(Date.now() - startTime);
-                            } else {
-                                reactionTimes.reversed.incongruent.push(Date.now() - startTime);
-                            }
-                        }
+                        reactionTimes.normal.incongruent.push(Date.now() - startTime);
                     }
                 } else {
                     // Incorrect response
-                    wrongGuesses[currentFlankerType]++;
+                    wrongGuesses.normal++;
                 }
 
                 document.removeEventListener("keydown", keyPressHandler);
@@ -193,6 +186,7 @@
                 let delay = Math.floor(Math.random() * (1000 - 250 + 1)) + 250;
                 setTimeout(() => {
                     currentTrial++;
+                    totalCompletedTrials++;
                     updateProgressBar();
                     runTrial();
                 }, delay);
@@ -211,8 +205,6 @@
             trials = generateTrials();
             currentTrial = 0;
             currentFlankerType = "reversed";
-            reactionTimes.reversed = { congruent: [], incongruent: [] };
-            wrongGuesses.reversed = 0;
             runReversedTrial();
         }
 
@@ -235,25 +227,14 @@
 
                 if ((targetDirection === "←" && event.key === "ArrowRight") || (targetDirection === "→" && event.key === "ArrowLeft")) {
                     // Correct response
-                    if (currentFlankerType === "normal") {
-                        if (isCongruent) {
-                            reactionTimes.normal.congruent.push(Date.now() - startTime);
-                        } else {
-                            reactionTimes.normal.incongruent.push(Date.now() - startTime);
-                        }
+                    if (isCongruent) {
+                        reactionTimes.reversed.congruent.push(Date.now() - startTime);
                     } else {
-                        // For reversed, the correct response is the opposite direction
-                        if ((targetDirection === "←" && event.key === "ArrowRight") || (targetDirection === "→" && event.key === "ArrowLeft")) {
-                            if (isCongruent) {
-                                reactionTimes.reversed.congruent.push(Date.now() - startTime);
-                            } else {
-                                reactionTimes.reversed.incongruent.push(Date.now() - startTime);
-                            }
-                        }
+                        reactionTimes.reversed.incongruent.push(Date.now() - startTime);
                     }
                 } else {
                     // Incorrect response
-                    wrongGuesses[currentFlankerType]++;
+                    wrongGuesses.reversed++;
                 }
 
                 document.removeEventListener("keydown", keyPressHandler);
@@ -261,6 +242,7 @@
                 let delay = Math.floor(Math.random() * (1000 - 250 + 1)) + 250;
                 setTimeout(() => {
                     currentTrial++;
+                    totalCompletedTrials++;
                     updateProgressBar();
                     runReversedTrial();
                 }, delay);
@@ -275,6 +257,7 @@
         function startAlertingTest() {
             document.getElementById("alertingInstructionsScreen").style.display = "none";
             document.getElementById("alertingTestScreen").style.display = "block";
+            spacebarPressCount = 0;
             document.addEventListener("keydown", spacebarHandler);
             runMultipleAlertingTests(0);
         }
@@ -288,6 +271,7 @@
         function runMultipleAlertingTests(testIndex) {
             if (testIndex >= 5) {
                 document.getElementById("alertingTestScreen").style.display = "none";
+                document.removeEventListener("keydown", spacebarHandler);
                 showResults();
                 return;
             }
@@ -303,6 +287,10 @@
                         alertingReactionTimes.push(reactionTime);
                         document.removeEventListener("keydown", spacebarTestHandler);
                         document.getElementById("alertingStimulus").style.display = "none";
+                        
+                        totalCompletedTrials++;
+                        updateProgressBar();
+                        
                         runMultipleAlertingTests(testIndex + 1);
                     }
                 }
@@ -311,31 +299,47 @@
         }
 
         function showResults() {
-            let totalNormalReactionTime = reactionTimes.normal.congruent.concat(reactionTimes.normal.incongruent).reduce((acc, time) => acc + time, 0);
-            let totalReversedReactionTime = reactionTimes.reversed.congruent.concat(reactionTimes.reversed.incongruent).reduce((acc, time) => acc + time, 0);
+            let averageNormalCongruent = reactionTimes.normal.congruent.length > 0 
+                ? reactionTimes.normal.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.congruent.length 
+                : 0;
+            
+            let averageNormalIncongruent = reactionTimes.normal.incongruent.length > 0
+                ? reactionTimes.normal.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.incongruent.length
+                : 0;
 
-            let averageNormalCongruent = reactionTimes.normal.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.congruent.length;
-            let averageNormalIncongruent = reactionTimes.normal.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.incongruent.length;
+            let averageReversedCongruent = reactionTimes.reversed.congruent.length > 0
+                ? reactionTimes.reversed.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.congruent.length
+                : 0;
+                
+            let averageReversedIncongruent = reactionTimes.reversed.incongruent.length > 0
+                ? reactionTimes.reversed.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.incongruent.length
+                : 0;
 
-            let averageReversedCongruent = reactionTimes.reversed.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.congruent.length;
-            let averageReversedIncongruent = reactionTimes.reversed.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.incongruent.length;
-
-            let totalAlertingReactionTime = alertingReactionTimes.reduce((acc, time) => acc + time, 0);
-            let averageAlertingReactionTime = totalAlertingReactionTime / alertingReactionTimes.length;
+            let averageAlertingReactionTime = alertingReactionTimes.length > 0
+                ? alertingReactionTimes.reduce((acc, time) => acc + time, 0) / alertingReactionTimes.length
+                : 0;
 
             document.getElementById("result").style.display = "block";
-            document.getElementById("result").textContent = `
-                Normal Flanker Test (Congruent): ${averageNormalCongruent} ms
-                Normal Flanker Test (Incongruent): ${averageNormalIncongruent} ms
-                Reversed Flanker Test (Congruent): ${averageReversedCongruent} ms
-                Reversed Flanker Test (Incongruent): ${averageReversedIncongruent} ms
-                Alerting Test: ${averageAlertingReactionTime} ms
+            document.getElementById("result").innerHTML = `
+                <p><strong>Results:</strong></p>
+                <p>Normal Flanker Test (Congruent): ${Math.round(averageNormalCongruent)} ms</p>
+                <p>Normal Flanker Test (Incongruent): ${Math.round(averageNormalIncongruent)} ms</p>
+                <p>Reversed Flanker Test (Congruent): ${Math.round(averageReversedCongruent)} ms</p>
+                <p>Reversed Flanker Test (Incongruent): ${Math.round(averageReversedIncongruent)} ms</p>
+                <p>Alerting Test: ${Math.round(averageAlertingReactionTime)} ms</p>
+                <p><strong>Errors:</strong></p>
+                <p>Normal Flanker Wrong Clicks: ${wrongGuesses.normal}</p>
+                <p>Reversed Flanker Wrong Clicks: ${wrongGuesses.reversed}</p>
+                <p>Total Spacebar Presses: ${spacebarPressCount}</p>
             `;
             document.getElementById("restartButton").style.display = "block";
+            
+            // Complete the progress bar
+            document.getElementById("progressBar").style.width = "100%";
         }
 
         function updateProgressBar() {
-            let progress = (currentTrial / trials.length) * 100;
+            let progress = (totalCompletedTrials / TOTAL_TRIALS) * 100;
             document.getElementById("progressBar").style.width = `${progress}%`;
         }
     </script>
