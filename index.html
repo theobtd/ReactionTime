@@ -4,89 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flanker & Alerting Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&display=swap');
+        
         body {
             text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Jost', Helvetica, sans-serif;
+            font-weight: 300;
+            background-color: #fbebdc;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             flex-direction: column;
             overflow: hidden;
+            color: #333;
+            letter-spacing: 0.03em;
         }
+        
+        h1 {
+            position: fixed;
+            top: 40px;
+            width: 100%;
+            text-align: center;
+            font-weight: 200;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #f4634c;
+            font-size: 36px;
+            margin: 0;
+        }
+        
         button {
-            font-size: 18px;
-            padding: 10px 20px;
+            font-family: 'Jost', Helvetica, sans-serif;
+            font-weight: 300;
+            font-size: 16px;
+            padding: 12px 28px;
             cursor: pointer;
-            margin: 10px;
-            border-radius: 5px;
-            background-color: #007bff;
+            margin: 12px;
+            border-radius: 2px;
+            background-color: #f4634c;
             color: white;
             border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
         }
+        
         button:hover {
-            background-color: #0056b3;
+            background-color: #fba899;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(244, 99, 76, 0.2);
         }
+        
         #arrowContainer {
             font-size: 100px;
             margin-top: 20px;
             display: none;
+            color: #f4634c;
         }
+        
         #result {
             display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 500px;
+            width: 90%;
+            margin: 20px auto;
+            text-align: left;
+            line-height: 1.6;
         }
+        
+        #result p {
+            margin: 8px 0;
+        }
+        
+        #result p strong {
+            color: #f4634c;
+            font-weight: 400;
+        }
+        
         #alertingTestScreen p {
-            font-size: 50px;
+            font-size: 80px;
             display: none;
+            color: #f4634c;
         }
+        
         #progressBarContainer {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #ddd;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            max-width: 400px;
+            background-color: #fba899;
+            height: 4px;
+            border-radius: 2px;
+            overflow: hidden;
         }
+        
         #progressBar {
-            height: 10px;
-            background-color: #4caf50;
+            height: 100%;
+            background-color: #f4634c;
             width: 0;
+            transition: width 0.3s ease-out;
         }
-        h1 {
-            position: fixed;
-            top: 20px;
-            width: 100%;
-            text-align: center;
+        
+        .instruction-screen {
+            background-color: white;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 500px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        
+        .instruction-screen p {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        .instruction-screen p strong {
+            color: #f4634c;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <h1>Flanker Task</h1>
-    <button id="startButton">Start Test</button>
+    <h1>Attention Networks Test</h1>
+    <button id="startButton">Begin Assessment</button>
     <div id="arrowContainer"></div>
-    <p id="result"></p>
-    <button id="restartButton" style="display: none;">Restart</button>
+    <div id="result"></div>
+    <button id="restartButton" style="display: none;">Take Test Again</button>
 
     <!-- Flanker Test Instructions -->
-    <div id="instructionsScreen" style="display: none;">
-        <p><strong>INSTRUCTIONS</strong></p>
+    <div id="instructionsScreen" class="instruction-screen" style="display: none;">
+        <p><strong>Instructions</strong></p>
         <p>Identify the direction of the center arrow and ignore the surrounding ones.</p>
-        <button id="understoodButton">Understood</button>
+        <button id="understoodButton">Continue</button>
     </div>
 
     <!-- Reversed Flanker Test Instructions -->
-    <div id="reversedInstructionsScreen" style="display: none;">
-        <p><strong>REVERSED FLANKER TEST</strong></p>
+    <div id="reversedInstructionsScreen" class="instruction-screen" style="display: none;">
+        <p><strong>Reversed Flanker Test</strong></p>
         <p>For this task, you need to press the opposite arrow key to the direction of the center arrow.</p>
-        <button id="understoodReversedButton">Understood</button>
+        <button id="understoodReversedButton">Continue</button>
     </div>
 
     <!-- Alerting Test Instructions -->
-    <div id="alertingInstructionsScreen" style="display: none;">
-        <p><strong>ALERTING NETWORK TEST</strong></p>
+    <div id="alertingInstructionsScreen" class="instruction-screen" style="display: none;">
+        <p><strong>Alerting Network Test</strong></p>
         <p>Press the spacebar as soon as you see the dot appear.</p>
-        <button id="understoodAlertingButton">Understood!</button>
+        <button id="understoodAlertingButton">Continue</button>
     </div>
 
     <!-- Alerting Test Screen -->
@@ -321,13 +399,13 @@
 
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
-                <p><strong>Results:</strong></p>
+                <p><strong>Your Results</strong></p>
                 <p>Normal Flanker Test (Congruent): ${Math.round(averageNormalCongruent)} ms</p>
                 <p>Normal Flanker Test (Incongruent): ${Math.round(averageNormalIncongruent)} ms</p>
                 <p>Reversed Flanker Test (Congruent): ${Math.round(averageReversedCongruent)} ms</p>
                 <p>Reversed Flanker Test (Incongruent): ${Math.round(averageReversedIncongruent)} ms</p>
                 <p>Alerting Test: ${Math.round(averageAlertingReactionTime)} ms</p>
-                <p><strong>Errors:</strong></p>
+                <p><strong>Performance Metrics</strong></p>
                 <p>Normal Flanker Wrong Clicks: ${wrongGuesses.normal}</p>
                 <p>Reversed Flanker Wrong Clicks: ${wrongGuesses.reversed}</p>
                 <p>Total Spacebar Presses: ${spacebarPressCount}</p>
