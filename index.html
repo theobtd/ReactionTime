@@ -63,6 +63,23 @@
             margin-top: 20px;
             display: none;
             color: #f4634c;
+            white-space: nowrap; /* Keep arrows in one line */
+            overflow: hidden; /* Changed from overflow-x: auto to prevent scrollbar */
+            padding: 0 10px;
+        }
+        
+        /* Responsive font size for arrows on small screens */
+        @media (max-width: 600px) {
+            #arrowContainer {
+                font-size: 60px; /* Smaller font size on mobile */
+            }
+        }
+        
+        /* Even smaller for very small screens */
+        @media (max-width: 400px) {
+            #arrowContainer {
+                font-size: 40px;
+            }
         }
         
         #result {
@@ -76,6 +93,8 @@
             margin: 20px auto;
             text-align: left;
             line-height: 1.6;
+            overflow-y: auto;
+            max-height: 70vh;
         }
         
         #result p {
@@ -137,6 +156,45 @@
             margin-bottom: 10px;
             font-size: 18px;
         }
+        
+        /* Touchscreen button styles */
+        #touchButtonsContainer {
+            display: none;
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+        }
+        
+        .touch-button {
+            width: 45%;
+            height: 70px;
+            font-size: 24px;
+            margin: 0 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #spaceButton {
+            width: 90%;
+            height: 70px;
+            font-size: 24px;
+            display: none;
+        }
+        
+        /* Device selection screen */
+        #deviceSelectionScreen {
+            display: none;
+            background-color: white;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 500px;
+            width: 90%;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -145,6 +203,14 @@
     <div id="arrowContainer"></div>
     <div id="result"></div>
     <button id="restartButton" style="display: none;">Take Test Again</button>
+
+    <!-- Device Selection Screen -->
+    <div id="deviceSelectionScreen" class="instruction-screen">
+        <p><strong>Choose Your Device</strong></p>
+        <p>Select how you would like to interact with this test:</p>
+        <button id="keyboardButton">Physical Keyboard</button>
+        <button id="touchscreenButton">Touchscreen Device</button>
+    </div>
 
     <!-- Flanker Test Instructions -->
     <div id="instructionsScreen" class="instruction-screen" style="display: none;">
@@ -172,6 +238,13 @@
         <p id="alertingStimulus">●</p>
     </div>
 
+    <!-- Touch buttons for mobile devices -->
+    <div id="touchButtonsContainer">
+        <button id="leftButton" class="touch-button">←</button>
+        <button id="rightButton" class="touch-button">→</button>
+        <button id="spaceButton" class="touch-button">Tap when you see the dot</button>
+    </div>
+
     <div id="progressBarContainer">
         <div id="progressBar"></div>
     </div>
@@ -186,13 +259,57 @@
         let currentPhase = "flanker"; // Keep track of the current phase of the test (flanker, reversed, alerting)
         let currentFlankerType = "normal"; // Track whether we are in the normal or reversed flanker phase
         let totalCompletedTrials = 0; // Track total completed trials for progress bar
+        let isTouchDevice = false; // Track if user selected touchscreen mode
         const TOTAL_TRIALS = 25; // 10 normal flanker + 10 reversed flanker + 5 alerting = 25 total trials
 
-        document.getElementById("startButton").addEventListener("click", showInstructions);
+        document.getElementById("startButton").addEventListener("click", showDeviceSelection);
         document.getElementById("restartButton").addEventListener("click", resetTest);
         document.getElementById("understoodButton").addEventListener("click", startFlankerTest);
         document.getElementById("understoodReversedButton").addEventListener("click", startReversedFlankerTest);
         document.getElementById("understoodAlertingButton").addEventListener("click", startAlertingTest);
+        document.getElementById("keyboardButton").addEventListener("click", function() {
+            isTouchDevice = false;
+            document.getElementById("deviceSelectionScreen").style.display = "none";
+            document.getElementById("touchButtonsContainer").style.display = "none";
+            showInstructions();
+        });
+        document.getElementById("touchscreenButton").addEventListener("click", function() {
+            isTouchDevice = true;
+            document.getElementById("deviceSelectionScreen").style.display = "none";
+            document.getElementById("touchButtonsContainer").style.display = "block";
+            document.getElementById("spaceButton").style.display = "none";
+            showInstructions();
+        });
+        
+        // Touch button event listeners
+        document.getElementById("leftButton").addEventListener("click", function() {
+            if (currentPhase === "flanker") {
+                handleArrowPress("ArrowLeft");
+            }
+        });
+        
+        document.getElementById("rightButton").addEventListener("click", function() {
+            if (currentPhase === "flanker") {
+                handleArrowPress("ArrowRight");
+            }
+        });
+        
+        document.getElementById("spaceButton").addEventListener("click", function() {
+            handleSpacePress();
+        });
+
+        function handleArrowPress(key) {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: key }));
+        }
+
+        function handleSpacePress() {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: " " }));
+        }
+
+        function showDeviceSelection() {
+            document.getElementById("startButton").style.display = "none";
+            document.getElementById("deviceSelectionScreen").style.display = "block";
+        }
 
         function resetTest() {
             document.getElementById("result").style.display = "none";
@@ -201,17 +318,23 @@
             wrongGuesses = { normal: 0, reversed: 0 };
             totalCompletedTrials = 0;
             updateProgressBar();
-            showInstructions();
+            showDeviceSelection();
         }
 
         function showInstructions() {
-            document.getElementById("startButton").style.display = "none";
             document.getElementById("instructionsScreen").style.display = "block";
         }
 
         function startFlankerTest() {
             document.getElementById("instructionsScreen").style.display = "none";
             document.getElementById("arrowContainer").style.display = "block";
+            
+            if (isTouchDevice) {
+                document.getElementById("spaceButton").style.display = "none";
+                document.getElementById("leftButton").style.display = "inline-flex";
+                document.getElementById("rightButton").style.display = "inline-flex";
+            }
+            
             trials = generateTrials();
             currentTrial = 0;
             reactionTimes = { normal: { congruent: [], incongruent: [] }, reversed: { congruent: [], incongruent: [] } };
@@ -280,10 +403,31 @@
         function startReversedFlankerTest() {
             document.getElementById("reversedInstructionsScreen").style.display = "none";
             document.getElementById("arrowContainer").style.display = "block";
+            
+            if (isTouchDevice) {
+                document.getElementById("spaceButton").style.display = "none";
+                document.getElementById("leftButton").style.display = "inline-flex";
+                document.getElementById("rightButton").style.display = "inline-flex";
+                
+                // Update touch button listeners for reversed test
+                document.getElementById("leftButton").onclick = function() {
+                    handleReversedArrowPress("ArrowLeft");
+                };
+                
+                document.getElementById("rightButton").onclick = function() {
+                    handleReversedArrowPress("ArrowRight");
+                };
+            }
+            
             trials = generateTrials();
             currentTrial = 0;
             currentFlankerType = "reversed";
             runReversedTrial();
+        }
+        
+        // New function specifically for handling reversed arrow press
+        function handleReversedArrowPress(key) {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: key }));
         }
 
         function runReversedTrial() {
@@ -330,11 +474,35 @@
 
         function showAlertingInstructions() {
             document.getElementById("alertingInstructionsScreen").style.display = "block";
+            
+            // Reset touch button listeners for next phase
+            if (isTouchDevice) {
+                document.getElementById("leftButton").onclick = function() {
+                    handleArrowPress("ArrowLeft");
+                };
+                
+                document.getElementById("rightButton").onclick = function() {
+                    handleArrowPress("ArrowRight");
+                };
+            }
+            
+            // Update instructions for touch device
+            if (isTouchDevice) {
+                document.querySelector("#alertingInstructionsScreen p:nth-child(2)").textContent = 
+                    "Tap the button as soon as you see the dot appear.";
+            }
         }
 
         function startAlertingTest() {
             document.getElementById("alertingInstructionsScreen").style.display = "none";
             document.getElementById("alertingTestScreen").style.display = "block";
+            
+            if (isTouchDevice) {
+                document.getElementById("leftButton").style.display = "none";
+                document.getElementById("rightButton").style.display = "none";
+                document.getElementById("spaceButton").style.display = "inline-flex";
+            }
+            
             spacebarPressCount = 0;
             document.addEventListener("keydown", spacebarHandler);
             runMultipleAlertingTests(0);
@@ -377,6 +545,10 @@
         }
 
         function showResults() {
+            if (isTouchDevice) {
+                document.getElementById("touchButtonsContainer").style.display = "none";
+            }
+            
             let averageNormalCongruent = reactionTimes.normal.congruent.length > 0 
                 ? reactionTimes.normal.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.congruent.length 
                 : 0;
@@ -409,6 +581,7 @@
                 <p>Normal Flanker Wrong Clicks: ${wrongGuesses.normal}</p>
                 <p>Reversed Flanker Wrong Clicks: ${wrongGuesses.reversed}</p>
                 <p>Total Spacebar Presses: ${spacebarPressCount}</p>
+                <p>Device Used: ${isTouchDevice ? 'Touchscreen' : 'Physical Keyboard'}</p>
             `;
             document.getElementById("restartButton").style.display = "block";
             
