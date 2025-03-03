@@ -177,6 +177,13 @@
             justify-content: center;
         }
         
+        /* New styles for active state of touch buttons */
+        .touch-button.active {
+            background-color: #d1503c;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
         #spaceButton {
             width: 90%;
             height: 70px;
@@ -256,10 +263,12 @@
         let wrongGuesses = { normal: 0, reversed: 0 };
         let alertingReactionTimes = [];
         let spacebarPressCount = 0;
+        let alertingTestStarted = false;
         let currentPhase = "flanker"; // Keep track of the current phase of the test (flanker, reversed, alerting)
         let currentFlankerType = "normal"; // Track whether we are in the normal or reversed flanker phase
         let totalCompletedTrials = 0; // Track total completed trials for progress bar
         let isTouchDevice = false; // Track if user selected touchscreen mode
+        let alertingTestActive = false; // Track when the actual alerting test is running
         const TOTAL_TRIALS = 25; // 10 normal flanker + 10 reversed flanker + 5 alerting = 25 total trials
 
         document.getElementById("startButton").addEventListener("click", showDeviceSelection);
@@ -281,22 +290,44 @@
             showInstructions();
         });
         
-        // Touch button event listeners
+        // Touch button event listeners with visual feedback
         document.getElementById("leftButton").addEventListener("click", function() {
             if (currentPhase === "flanker") {
+                // Add active class for visual feedback
+                addActiveClass(this);
                 handleArrowPress("ArrowLeft");
             }
         });
         
         document.getElementById("rightButton").addEventListener("click", function() {
             if (currentPhase === "flanker") {
+                // Add active class for visual feedback
+                addActiveClass(this);
                 handleArrowPress("ArrowRight");
             }
         });
         
+        // Fixed spacebar press count for touch devices
         document.getElementById("spaceButton").addEventListener("click", function() {
+            // Add active class for visual feedback
+            addActiveClass(this);
+            
+            // Only increment the counter if the alerting test has started
+            if (alertingTestStarted) {
+                spacebarPressCount++;
+            }
+            
+            // Also dispatch the keyboard event for compatibility
             handleSpacePress();
         });
+
+        // Function to add active class and remove it after delay
+        function addActiveClass(button) {
+            button.classList.add('active');
+            setTimeout(() => {
+                button.classList.remove('active');
+            }, 200); // Remove after 200ms
+        }
 
         function handleArrowPress(key) {
             document.dispatchEvent(new KeyboardEvent('keydown', { key: key }));
@@ -315,8 +346,10 @@
             document.getElementById("result").style.display = "none";
             document.getElementById("restartButton").style.display = "none";
             spacebarPressCount = 0;
+            alertingTestStarted = false;
             wrongGuesses = { normal: 0, reversed: 0 };
             totalCompletedTrials = 0;
+            alertingTestActive = false;
             updateProgressBar();
             showDeviceSelection();
         }
@@ -411,10 +444,14 @@
                 
                 // Update touch button listeners for reversed test
                 document.getElementById("leftButton").onclick = function() {
+                    // Add active class for visual feedback
+                    addActiveClass(this);
                     handleReversedArrowPress("ArrowLeft");
                 };
                 
                 document.getElementById("rightButton").onclick = function() {
+                    // Add active class for visual feedback
+                    addActiveClass(this);
                     handleReversedArrowPress("ArrowRight");
                 };
             }
@@ -425,7 +462,7 @@
             runReversedTrial();
         }
         
-        // New function specifically for handling reversed arrow press
+        // Function specifically for handling reversed arrow press
         function handleReversedArrowPress(key) {
             document.dispatchEvent(new KeyboardEvent('keydown', { key: key }));
         }
@@ -473,21 +510,20 @@
         }
 
         function showAlertingInstructions() {
+            currentPhase = "alerting";
             document.getElementById("alertingInstructionsScreen").style.display = "block";
             
-            // Reset touch button listeners for next phase
-            if (isTouchDevice) {
-                document.getElementById("leftButton").onclick = function() {
-                    handleArrowPress("ArrowLeft");
-                };
-                
-                document.getElementById("rightButton").onclick = function() {
-                    handleArrowPress("ArrowRight");
-                };
-            }
+            // Reset spacebar press count before showing alerting instructions
+            spacebarPressCount = 0;
             
-            // Update instructions for touch device
+            // Update touch button display for the alerting instructions screen
             if (isTouchDevice) {
+                // Hide the arrow buttons and show the space button during instructions
+                document.getElementById("leftButton").style.display = "none";
+                document.getElementById("rightButton").style.display = "none";
+                document.getElementById("spaceButton").style.display = "inline-flex";
+                
+                // Update instructions for touch device
                 document.querySelector("#alertingInstructionsScreen p:nth-child(2)").textContent = 
                     "Tap the button as soon as you see the dot appear.";
             }
@@ -497,19 +533,21 @@
             document.getElementById("alertingInstructionsScreen").style.display = "none";
             document.getElementById("alertingTestScreen").style.display = "block";
             
-            if (isTouchDevice) {
-                document.getElementById("leftButton").style.display = "none";
-                document.getElementById("rightButton").style.display = "none";
-                document.getElementById("spaceButton").style.display = "inline-flex";
+            // Set the flag to start counting space presses
+            alertingTestStarted = true;
+            
+            // Start tracking keyboard spacebar presses only if not in touch mode
+            if (!isTouchDevice) {
+                document.addEventListener("keydown", trackKeyboardSpacebarPresses);
             }
             
-            spacebarPressCount = 0;
-            document.addEventListener("keydown", spacebarHandler);
+            // Start the alerting test trials
             runMultipleAlertingTests(0);
         }
 
-        function spacebarHandler(event) {
-            if (event.key === " ") {
+        // Function to track keyboard spacebar presses during the alerting test phase
+        function trackKeyboardSpacebarPresses(event) {
+            if (event.key === " " && alertingTestStarted) {
                 spacebarPressCount++;
             }
         }
@@ -517,7 +555,12 @@
         function runMultipleAlertingTests(testIndex) {
             if (testIndex >= 5) {
                 document.getElementById("alertingTestScreen").style.display = "none";
-                document.removeEventListener("keydown", spacebarHandler);
+                
+                // Remove the spacebar tracking when test is complete
+                if (!isTouchDevice) {
+                    document.removeEventListener("keydown", trackKeyboardSpacebarPresses);
+                }
+                
                 showResults();
                 return;
             }
@@ -526,9 +569,14 @@
             setTimeout(() => {
                 document.getElementById("alertingStimulus").style.display = "block";
                 let startTime = Date.now();
+                
+                // Flag for reaction time tracking, to ensure we only count legitimate responses
+                let reactionRecorded = false;
 
+                // For keyboard users
                 function spacebarTestHandler(event) {
-                    if (event.key === " ") {
+                    if (event.key === " " && !reactionRecorded) {
+                        reactionRecorded = true;
                         let reactionTime = Date.now() - startTime;
                         alertingReactionTimes.push(reactionTime);
                         document.removeEventListener("keydown", spacebarTestHandler);
@@ -540,11 +588,47 @@
                         runMultipleAlertingTests(testIndex + 1);
                     }
                 }
-                document.addEventListener("keydown", spacebarTestHandler);
+                
+                // For touchscreen users
+                function touchSpacebarHandler() {
+                    if (!reactionRecorded) {
+                        reactionRecorded = true;
+                        let reactionTime = Date.now() - startTime;
+                        alertingReactionTimes.push(reactionTime);
+                        
+                        // We don't need to increment spacebarPressCount here
+                        // as it's already handled by the button's main click handler
+                        
+                        document.getElementById("alertingStimulus").style.display = "none";
+                        
+                        totalCompletedTrials++;
+                        updateProgressBar();
+                        
+                        // Delay next test to ensure there's time between trials
+                        setTimeout(() => {
+                            runMultipleAlertingTests(testIndex + 1);
+                        }, 100);
+                    }
+                }
+                
+                if (isTouchDevice) {
+                    // For touchscreen devices, just add a one-time click handler
+                    // that records reaction time but doesn't interfere with the
+                    // main spaceButton click handler that counts presses
+                    let spaceButton = document.getElementById("spaceButton");
+                    
+                    // Use once:true to ensure the handler is automatically removed after firing
+                    spaceButton.addEventListener("click", touchSpacebarHandler, { once: true });
+                } else {
+                    document.addEventListener("keydown", spacebarTestHandler);
+                }
             }, delay);
         }
 
         function showResults() {
+            // Set flag to stop counting space presses
+            alertingTestStarted = false;
+            
             if (isTouchDevice) {
                 document.getElementById("touchButtonsContainer").style.display = "none";
             }
