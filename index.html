@@ -270,6 +270,9 @@
         let isTouchDevice = false; // Track if user selected touchscreen mode
         let alertingTestActive = false; // Track when the actual alerting test is running
         const TOTAL_TRIALS = 25; // 10 normal flanker + 10 reversed flanker + 5 alerting = 25 total trials
+        // Track if we are on the first trial for each test type
+        let isFirstNormalTrial = true;
+        let isFirstReversedTrial = true;
 
         document.getElementById("startButton").addEventListener("click", showDeviceSelection);
         document.getElementById("restartButton").addEventListener("click", resetTest);
@@ -350,6 +353,8 @@
             wrongGuesses = { normal: 0, reversed: 0 };
             totalCompletedTrials = 0;
             alertingTestActive = false;
+            isFirstNormalTrial = true;
+            isFirstReversedTrial = true;
             updateProgressBar();
             showDeviceSelection();
         }
@@ -374,6 +379,7 @@
             wrongGuesses = { normal: 0, reversed: 0 };
             currentPhase = "flanker";
             currentFlankerType = "normal";
+            isFirstNormalTrial = true;
             runTrial();
         }
 
@@ -404,21 +410,30 @@
                 document.getElementById("arrowContainer").style.display = "none";
 
                 if ((targetDirection === "←" && event.key === "ArrowLeft") || (targetDirection === "→" && event.key === "ArrowRight")) {
-                    // Correct response
-                    if (isCongruent) {
-                        reactionTimes.normal.congruent.push(Date.now() - startTime);
-                    } else {
-                        reactionTimes.normal.incongruent.push(Date.now() - startTime);
+                    // Correct response - only record if not the first trial
+                    if (!isFirstNormalTrial) {
+                        if (isCongruent) {
+                            reactionTimes.normal.congruent.push(Date.now() - startTime);
+                        } else {
+                            reactionTimes.normal.incongruent.push(Date.now() - startTime);
+                        }
                     }
                 } else {
-                    // Incorrect response
-                    wrongGuesses.normal++;
+                    // Incorrect response - only count if not the first trial
+                    if (!isFirstNormalTrial) {
+                        wrongGuesses.normal++;
+                    }
                 }
 
                 document.removeEventListener("keydown", keyPressHandler);
 
                 let delay = Math.floor(Math.random() * (1000 - 250 + 1)) + 250;
                 setTimeout(() => {
+                    // Mark that we've completed the first trial
+                    if (isFirstNormalTrial) {
+                        isFirstNormalTrial = false;
+                    }
+                    
                     currentTrial++;
                     totalCompletedTrials++;
                     updateProgressBar();
@@ -459,6 +474,7 @@
             trials = generateTrials();
             currentTrial = 0;
             currentFlankerType = "reversed";
+            isFirstReversedTrial = true;
             runReversedTrial();
         }
         
@@ -485,21 +501,30 @@
                 document.getElementById("arrowContainer").style.display = "none";
 
                 if ((targetDirection === "←" && event.key === "ArrowRight") || (targetDirection === "→" && event.key === "ArrowLeft")) {
-                    // Correct response
-                    if (isCongruent) {
-                        reactionTimes.reversed.congruent.push(Date.now() - startTime);
-                    } else {
-                        reactionTimes.reversed.incongruent.push(Date.now() - startTime);
+                    // Correct response - only record if not the first trial
+                    if (!isFirstReversedTrial) {
+                        if (isCongruent) {
+                            reactionTimes.reversed.congruent.push(Date.now() - startTime);
+                        } else {
+                            reactionTimes.reversed.incongruent.push(Date.now() - startTime);
+                        }
                     }
                 } else {
-                    // Incorrect response
-                    wrongGuesses.reversed++;
+                    // Incorrect response - only count if not the first trial
+                    if (!isFirstReversedTrial) {
+                        wrongGuesses.reversed++;
+                    }
                 }
 
                 document.removeEventListener("keydown", keyPressHandler);
 
                 let delay = Math.floor(Math.random() * (1000 - 250 + 1)) + 250;
                 setTimeout(() => {
+                    // Mark that we've completed the first trial
+                    if (isFirstReversedTrial) {
+                        isFirstReversedTrial = false;
+                    }
+                    
                     currentTrial++;
                     totalCompletedTrials++;
                     updateProgressBar();
@@ -666,6 +691,7 @@
                 <p>Reversed Flanker Wrong Clicks: ${wrongGuesses.reversed}</p>
                 <p>Total Spacebar Presses: ${spacebarPressCount}</p>
                 <p>Device Used: ${isTouchDevice ? 'Touchscreen' : 'Physical Keyboard'}</p>
+                <p><small>Note: First trial of each flanker test was excluded from calculations.</small></p>
             `;
             document.getElementById("restartButton").style.display = "block";
             
