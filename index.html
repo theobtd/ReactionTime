@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flanker & Alerting Test</title>
+    <title>CogniLab</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-database-compat.min.js"></script>
@@ -91,14 +91,13 @@
             max-width: 500px;
             width: 90%;
             margin: 20px auto;
-            text-align: left;
+            text-align: center;
             line-height: 1.6;
-            overflow-y: auto;
-            max-height: 70vh;
         }
         
         #result p {
-            margin: 8px 0;
+            margin: 16px 0;
+            font-size: 18px;
         }
         
         #result p strong {
@@ -223,7 +222,7 @@
     </style>
 </head>
 <body>
-    <h1>Attention Networks Test</h1>
+    <h1>CogniLab</h1>
     <button id="startButton">Begin Assessment</button>
     <div id="arrowContainer"></div>
     <div id="result"></div>
@@ -252,19 +251,19 @@
     </div>
 
     <div id="instructionsScreen" class="instruction-screen" style="display: none;">
-        <p><strong>Instructions</strong></p>
+        <p><strong>Section 1</strong></p>
         <p>Identify the direction of the center arrow and ignore the surrounding ones.</p>
         <button id="understoodButton">Continue</button>
     </div>
 
     <div id="reversedInstructionsScreen" class="instruction-screen" style="display: none;">
-        <p><strong>Reversed Flanker Test</strong></p>
+        <p><strong>Section 2</strong></p>
         <p>For this task, you need to press the opposite arrow key to the direction of the center arrow.</p>
         <button id="understoodReversedButton">Continue</button>
     </div>
 
     <div id="alertingInstructionsScreen" class="instruction-screen" style="display: none;">
-        <p><strong>Alerting Network Test</strong></p>
+        <p><strong>Section 3</strong></p>
         <p>Press the spacebar as soon as you see the dot appear.</p>
         <button id="understoodAlertingButton">Continue</button>
     </div>
@@ -749,19 +748,9 @@
 
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
-                <p><strong>Your Results</strong></p>
-                <p>Normal Flanker Test (Congruent): ${Math.round(averageNormalCongruent)} ms</p>
-                <p>Normal Flanker Test (Incongruent): ${Math.round(averageNormalIncongruent)} ms</p>
-                <p>Reversed Flanker Test (Congruent): ${Math.round(averageReversedCongruent)} ms</p>
-                <p>Reversed Flanker Test (Incongruent): ${Math.round(averageReversedIncongruent)} ms</p>
-                <p>Alerting Test: ${Math.round(averageAlertingReactionTime)} ms</p>
-                <p><strong>Performance Metrics</strong></p>
-                <p>Normal Flanker Wrong Clicks: ${wrongGuesses.normal}</p>
-                <p>Reversed Flanker Wrong Clicks: ${wrongGuesses.reversed}</p>
-                <p>Total Spacebar Presses: ${spacebarPressCount}</p>
-                <p>Device Used: ${isTouchDevice ? 'Touchscreen' : 'Physical Keyboard'}</p>
-                <p><small>Note: First trial of each flanker test was excluded from calculations.</small></p>
-                <p><small>Results have been saved to the database.</small></p>
+                <p><strong>Thank You</strong></p>
+                <p>Your assessment has been completed successfully.</p>
+                <p>All data has been submitted.</p>
             `;
             document.getElementById("restartButton").style.display = "block";
             
