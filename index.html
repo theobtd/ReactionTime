@@ -342,20 +342,17 @@
         
         document.getElementById("leftButton").addEventListener("click", function() {
             if (currentPhase === "flanker") {
-                addActiveClass(this);
                 handleArrowPress("ArrowLeft");
             }
         });
         
         document.getElementById("rightButton").addEventListener("click", function() {
             if (currentPhase === "flanker") {
-                addActiveClass(this);
                 handleArrowPress("ArrowRight");
             }
         });
         
         document.getElementById("spaceButton").addEventListener("click", function() {
-            addActiveClass(this);
             if (alertingTestStarted) {
                 spacebarPressCount++;
             }
@@ -391,10 +388,12 @@
         }
 
         function addActiveClass(button) {
-            button.classList.add('active');
-            setTimeout(() => {
-                button.classList.remove('active');
-            }, 200);
+            if (!isTouchDevice) {
+                button.classList.add('active');
+                setTimeout(() => {
+                    button.classList.remove('active');
+                }, 200);
+            }
         }
 
         function handleArrowPress(key) {
@@ -516,12 +515,10 @@
                 document.getElementById("rightButton").style.display = "inline-flex";
                 
                 document.getElementById("leftButton").onclick = function() {
-                    addActiveClass(this);
                     handleReversedArrowPress("ArrowLeft");
                 };
                 
                 document.getElementById("rightButton").onclick = function() {
-                    addActiveClass(this);
                     handleReversedArrowPress("ArrowRight");
                 };
             }
