@@ -297,6 +297,25 @@
         let participantInfo = {};
         let firebaseDb;
         let sessionId;
+        
+        // Cutoff thresholds for risk assessment
+        const CUTOFFS = {
+            normalFlanker: {
+                congruent: 878,
+                incongruent: 954,
+                wrongGuesses: 2
+            },
+            reversedFlanker: {
+                congruent: 958,
+                incongruent: 1043,
+                wrongGuesses: 2
+            },
+            alertingTest: {
+                reactionTime: 798,
+                spacebarPressCount: 7
+            }
+        };
+        
         const firebaseConfig = {
             apiKey: "AIzaSyAhm0IyK-dy62fXrnaukA6tE5bJshT7_yg",
             authDomain: "cognilabdata.firebaseapp.com",
@@ -628,6 +647,91 @@
                 }
             }, delay);
         }
+        
+        function assessRiskLevel(results) {
+            // Initialize array to track indicators above cutoff level
+            let indicatorsAboveCutoff = [];
+            
+            // Check normal flanker congruent reaction time
+            if (results.normalFlanker.congruent > CUTOFFS.normalFlanker.congruent) {
+                indicatorsAboveCutoff.push("Normal task reaction time (matching arrows)");
+            }
+            
+            // Check normal flanker incongruent reaction time
+            if (results.normalFlanker.incongruent > CUTOFFS.normalFlanker.incongruent) {
+                indicatorsAboveCutoff.push("Normal task reaction time (conflicting arrows)");
+            }
+            
+            // Check normal flanker wrong guesses
+            if (results.normalFlanker.wrongGuesses > CUTOFFS.normalFlanker.wrongGuesses) {
+                indicatorsAboveCutoff.push("Normal task accuracy");
+            }
+            
+            // Check reversed flanker congruent reaction time
+            if (results.reversedFlanker.congruent > CUTOFFS.reversedFlanker.congruent) {
+                indicatorsAboveCutoff.push("Reversed task reaction time (matching arrows)");
+            }
+            
+            // Check reversed flanker incongruent reaction time
+            if (results.reversedFlanker.incongruent > CUTOFFS.reversedFlanker.incongruent) {
+                indicatorsAboveCutoff.push("Reversed task reaction time (conflicting arrows)");
+            }
+            
+            // Check reversed flanker wrong guesses
+            if (results.reversedFlanker.wrongGuesses > CUTOFFS.reversedFlanker.wrongGuesses) {
+                indicatorsAboveCutoff.push("Reversed task accuracy");
+            }
+            
+            // Check alerting test reaction time
+            if (results.alertingTest.averageReactionTime > CUTOFFS.alertingTest.reactionTime) {
+                indicatorsAboveCutoff.push("Alertness reaction time");
+            }
+            
+            // Check spacebar press count
+            if (results.alertingTest.spacebarPressCount > CUTOFFS.alertingTest.spacebarPressCount) {
+                indicatorsAboveCutoff.push("Focus control");
+            }
+            
+            // Determine risk level based on number of indicators above cutoff
+            let riskLevel;
+            let riskColor;
+            let recommendations;
+            
+            if (indicatorsAboveCutoff.length === 0) {
+                riskLevel = "Low Risk";
+                riskColor = "#4CAF50"; // Green
+                recommendations = [
+                    "Your cognitive performance is within optimal range.",
+                    "Continue with your current routine and maintain a balanced lifestyle.",
+                    "Regular exercise and adequate sleep will help sustain your cognitive health."
+                ];
+            } else if (indicatorsAboveCutoff.length === 1) {
+                riskLevel = "Medium Risk";
+                riskColor = "#FF9800"; // Orange
+                recommendations = [
+                    "Some aspects of your cognitive performance may benefit from attention.",
+                    "Consider incorporating mindfulness or relaxation techniques into your daily routine.",
+                    "Ensure you're getting 7-9 hours of quality sleep and maintain a balanced diet."
+                ];
+            } else {
+                riskLevel = "High Risk";
+                riskColor = "#F44336"; // Red
+                recommendations = [
+                    "Multiple aspects of your cognitive performance show potential signs of fatigue or stress.",
+                    "Consider consulting with a health professional or team psychologist.",
+                    "Prioritize rest, recovery, and sleep quality in your training schedule.",
+                    "Monitor your stress levels and implement stress-reduction techniques."
+                ];
+            }
+            
+            return {
+                level: riskLevel,
+                color: riskColor,
+                indicators: indicatorsAboveCutoff,
+                recommendations: recommendations
+            };
+        }
+        
         function showResults() {
             alertingTestStarted = false;
             if (isTouchDevice) {
@@ -648,6 +752,7 @@
             let averageAlertingReactionTime = alertingReactionTimes.length > 0
                 ? alertingReactionTimes.reduce((acc, time) => acc + time, 0) / alertingReactionTimes.length
                 : 0;
+            
             const resultData = {
                 participantInfo: participantInfo,
                 testResults: {
@@ -678,6 +783,17 @@
                     completedAt: new Date().toISOString()
                 }
             };
+            
+            // Assess risk level based on results
+            const riskAssessment = assessRiskLevel(resultData.testResults);
+            
+            // Add risk assessment to the result data
+            resultData.testResults.riskAssessment = {
+                level: riskAssessment.level,
+                indicators: riskAssessment.indicators
+            };
+            
+            // Save complete data to Firebase
             firebaseDb.ref('attentionNetworkTest/' + sessionId).set(resultData)
                 .then(() => {
                     console.log("Data saved successfully");
@@ -685,15 +801,65 @@
                 .catch((error) => {
                     console.error("Error saving data: ", error);
                 });
+            
+            // Create recommendations HTML
+            let recommendationsHTML = '';
+            riskAssessment.recommendations.forEach(rec => {
+                recommendationsHTML += `<li>${rec}</li>`;
+            });
+            
+            // Display the results with the risk assessment
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
+                <style>
+                    .risk-badge {
+                        display: inline-block;
+                        padding: 5px 12px;
+                        border-radius: 20px;
+                        color: white;
+                        font-weight: 400;
+                        margin-bottom: 15px;
+                        font-size: 16px;
+                        letter-spacing: 0.05em;
+                    }
+                    .recommendations {
+                        text-align: left;
+                        margin-top: 15px;
+                    }
+                    .recommendations ul {
+                        padding-left: 20px;
+                    }
+                    .recommendations li {
+                        margin-bottom: 10px;
+                        line-height: 1.4;
+                    }
+                    .indicators {
+                        text-align: left;
+                        margin-top: 15px;
+                    }
+                    .indicators ul {
+                        padding-left: 20px;
+                    }
+                </style>
                 <p><strong>Thank You</strong></p>
                 <p>Your assessment has been completed successfully.</p>
-                <p>All data has been submitted.</p>
+                <div>
+                    <span class="risk-badge" style="background-color: ${riskAssessment.color};">
+                        ${riskAssessment.level}
+                    </span>
+                </div>
+                <div class="recommendations">
+                    <p><strong>Recommendations:</strong></p>
+                    <ul>
+                        ${recommendationsHTML}
+                    </ul>
+                </div>
             `;
+            
             document.getElementById("restartButton").style.display = "block";
             document.getElementById("progressBar").style.width = "100%";
         }
+        
         function updateProgressBar() {
             let progress = (totalCompletedTrials / TOTAL_TRIALS) * 100;
             document.getElementById("progressBar").style.width = `${progress}%`;
