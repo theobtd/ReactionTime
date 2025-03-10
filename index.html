@@ -22,6 +22,9 @@
             overflow: hidden;
             color: #333;
             letter-spacing: 0.03em;
+            padding: 100px 0 60px 0; /* Top padding for title, bottom for progress bar */
+            box-sizing: border-box; /* Make sure padding is included in element's total height */
+
         }
         h1 {
             position: fixed;
@@ -464,7 +467,10 @@
         function generateUniqueId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         }
-        document.getElementById("startButton").addEventListener("click", showParticipantInfoScreen);
+        document.getElementById("startButton").addEventListener("click", function() {
+            showParticipantInfoScreen();
+            toggleProgressBar(false);
+        });
         document.getElementById("restartButton").addEventListener("click", resetTest);
         document.getElementById("submitParticipantInfo").addEventListener("click", submitParticipantInfo);
         document.getElementById("understoodButton").addEventListener("click", () => startCountdown("normal"));
@@ -504,32 +510,44 @@
             }
             handleSpacePress();
         });
-        function startCountdown(testType) {
-            document.getElementById("instructionsScreen").style.display = "none";
-            document.getElementById("reversedInstructionsScreen").style.display = "none";
-            document.getElementById("alertingInstructionsScreen").style.display = "none";
-            const countdownContainer = document.getElementById("countdownContainer");
-            countdownContainer.style.display = "block";
-            countdownContainer.textContent = "3";
-            setTimeout(() => {
-                countdownContainer.textContent = "2";
-                setTimeout(() => {
-                    countdownContainer.textContent = "1";
+      
+      
+        // Add this function to toggle progress bar visibility
+        function toggleProgressBar(show) {
+            const progressBarContainer = document.getElementById("progressBarContainer");
+            progressBarContainer.style.display = show ? "block" : "none";
+        }
+
+      
+        // Call this at the beginning to hide progress bar initially
+        toggleProgressBar(false);
+                function startCountdown(testType) {
+                    document.getElementById("instructionsScreen").style.display = "none";
+                    document.getElementById("reversedInstructionsScreen").style.display = "none";
+                    document.getElementById("alertingInstructionsScreen").style.display = "none";
+                    const countdownContainer = document.getElementById("countdownContainer");
+                    countdownContainer.style.display = "block";
+                    countdownContainer.textContent = "3";
                     setTimeout(() => {
-                        countdownContainer.style.display = "none";
-                        if (testType === "normal") {
-                            startFlankerTest();
-                        } else if (testType === "reversed") {
-                            startReversedFlankerTest();
-                        } else if (testType === "alerting") {
-                            startAlertingTest();
-                        }
+                        countdownContainer.textContent = "2";
+                        setTimeout(() => {
+                            countdownContainer.textContent = "1";
+                            setTimeout(() => {
+                                countdownContainer.style.display = "none";
+                                if (testType === "normal") {
+                                    startFlankerTest();
+                                } else if (testType === "reversed") {
+                                    startReversedFlankerTest();
+                                } else if (testType === "alerting") {
+                                    startAlertingTest();
+                                }
+                            }, 1000);
+                        }, 1000);
                     }, 1000);
-                }, 1000);
-            }, 1000);
         }
         function showParticipantInfoScreen() {
             document.getElementById("startButton").style.display = "none";
+            document.querySelector("h1").style.display = "none"; // Hide the title
             document.getElementById("participantInfoScreen").style.display = "block";
         }
         function submitParticipantInfo() {
@@ -580,9 +598,11 @@
         }
         function showInstructions() {
             document.getElementById("instructionsScreen").style.display = "block";
+            toggleProgressBar(false);
         }
         function startFlankerTest() {
             document.getElementById("arrowContainer").style.display = "block";
+            toggleProgressBar(true);
             if (isTouchDevice) {
                 document.getElementById("touchButtonsContainer").style.display = "block";
             }
@@ -656,9 +676,11 @@
                 document.getElementById("touchButtonsContainer").style.display = "none";
             }
             document.getElementById("reversedInstructionsScreen").style.display = "block";
+            toggleProgressBar(false);
         }
         function startReversedFlankerTest() {
             document.getElementById("arrowContainer").style.display = "block";
+            toggleProgressBar(true);
             if (isTouchDevice) {
                 document.getElementById("touchButtonsContainer").style.display = "block";
             }
@@ -731,6 +753,7 @@
                 document.getElementById("touchButtonsContainer").style.display = "none";
             }
             document.getElementById("alertingInstructionsScreen").style.display = "block";
+            toggleProgressBar(false);
             spacebarPressCount = 0;
             if (isTouchDevice) {
                 document.getElementById("leftButton").style.display = "none";
@@ -745,6 +768,7 @@
       
         function startAlertingTest() {
             document.getElementById("alertingTestScreen").style.display = "block";
+            toggleProgressBar(true);
             alertingTestStarted = true;
             if (isTouchDevice) {
                 document.getElementById("touchButtonsContainer").style.display = "block";
@@ -896,6 +920,7 @@
             if (isTouchDevice) {
                 document.getElementById("touchButtonsContainer").style.display = "none";
             }
+            toggleProgressBar(false);
             let averageNormalCongruent = reactionTimes.normal.congruent.length > 0 
                 ? reactionTimes.normal.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.congruent.length 
                 : 0;
