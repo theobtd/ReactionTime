@@ -235,6 +235,7 @@
     <div id="result"></div>
     <button id="restartButton" style="display: none;">Take Test Again</button>
     <div id="countdownContainer">3</div>
+  
     <div id="participantInfoScreen" class="instruction-screen">
         <p><strong>Participant Information</strong></p>
         <p>Please enter your information before proceeding:</p>
@@ -247,8 +248,21 @@
             <option value="prefer-not-to-say">Prefer not to say</option>
         </select>
         <input type="text" id="participantId" class="input-field" placeholder="Participant ID - If any">
-        <button id="submitParticipantInfo">Continue</button>
+
+        <div id="disclaimerContainer" style="margin: 20px 0; padding: 15px; background-color: #f8f8f8; border-radius: 4px; border-left: 4px solid #4682B4; text-align: left;">
+            <p style="font-weight: bold; margin-bottom: 10px;">Medical/Legal Disclaimer</p>
+            <p style="font-size: 14px; line-height: 1.5; margin-bottom: 15px;">
+                This cognitive assessment is intended for informational purposes only and is not a clinical diagnostic tool. Results should not be interpreted as medical advice. CogniLab does not provide medical diagnoses, treatment recommendations, or other medical services. If you have concerns about your cognitive health, please consult with a qualified healthcare professional.
+            </p>
+            <div style="display: flex; align-items: center; margin-top: 10px;">
+                <input type="checkbox" id="disclaimerCheckbox" style="margin-right: 10px;">
+                <label for="disclaimerCheckbox" style="font-size: 14px;">I understand and agree to the above disclaimer</label>
+            </div>
+        </div>
+
+        <button id="submitParticipantInfo" disabled style="opacity: 0.6; cursor: not-allowed;">Continue</button>
     </div>
+  
     <div id="deviceSelectionScreen" class="instruction-screen">
         <p><strong>Choose Your Device</strong></p>
         <p>Select how you would like to interact with this test:</p>
@@ -512,6 +526,21 @@
         });
       
       
+        // Add this after your existing event listeners
+        document.getElementById("disclaimerCheckbox").addEventListener("change", function() {
+            const submitButton = document.getElementById("submitParticipantInfo");
+            if (this.checked) {
+                submitButton.disabled = false;
+                submitButton.style.opacity = "1";
+                submitButton.style.cursor = "pointer";
+            } else {
+                submitButton.disabled = true;
+                submitButton.style.opacity = "0.6";
+                submitButton.style.cursor = "not-allowed";
+            }
+        });
+      
+      
         // Add this function to toggle progress bar visibility
         function toggleProgressBar(show) {
             const progressBarContainer = document.getElementById("progressBarContainer");
@@ -597,24 +626,36 @@
             document.querySelector("h1").style.display = "none"; // Hide the title
             document.getElementById("participantInfoScreen").style.display = "block";
         }
+        
         function submitParticipantInfo() {
             let participantId = document.getElementById("participantId").value.trim();
             let age = document.getElementById("participantAge").value.trim();
             let gender = document.getElementById("participantGender").value;
+            let disclaimerAccepted = document.getElementById("disclaimerCheckbox").checked;
+
             if (!age || !gender) {
                 alert("Please fill in age and gender fields.");
                 return;
             }
+
+            if (!disclaimerAccepted) {
+                alert("Please read and agree to the disclaimer before continuing.");
+                return;
+            }
+
             participantInfo = {
                 participantId: participantId,
                 age: age,
                 gender: gender,
+                disclaimerAccepted: true,
                 timestamp: new Date().toISOString()
             };
+
             sessionId = generateUniqueId();
             document.getElementById("participantInfoScreen").style.display = "none";
             document.getElementById("deviceSelectionScreen").style.display = "block";
         }
+      
         function addActiveClass(button) {
             if (!isTouchDevice) {
                 button.classList.add('active');
