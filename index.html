@@ -517,8 +517,55 @@
             const progressBarContainer = document.getElementById("progressBarContainer");
             progressBarContainer.style.display = show ? "block" : "none";
         }
-
       
+        // Helper function to validate email format
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+      
+      
+      
+      // Function to handle email subscription
+        function subscribeToReminders() {
+            const email = document.getElementById("reminderEmail").value.trim();
+            const messageElement = document.getElementById("subscriptionMessage");
+
+            // Simple email validation
+            if (!email) {
+                messageElement.textContent = "Please enter your email address.";
+                messageElement.style.color = "#F44336";
+                messageElement.style.display = "block";
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                messageElement.textContent = "Please enter a valid email address.";
+                messageElement.style.color = "#F44336";
+                messageElement.style.display = "block";
+                return;
+            }
+
+            // Prepare data for Firebase
+            const reminderData = {
+                email: email,
+                participantId: participantInfo.participantId || "",
+                subscribedAt: new Date().toISOString(),
+                testSessionId: sessionId
+            };
+
+            // Save to Firebase
+            firebaseDb.ref('reminderSubscriptions/' + generateUniqueId()).set(reminderData)
+                .then(() => {
+                    messageElement.textContent = "Thank you! You've been subscribed to test reminders.";
+                    messageElement.style.color = "#4CAF50";
+                    messageElement.style.display = "block";
+                    document.getElementById("reminderEmail").value = "";
+                    document.getElementById("subscribeButton").disabled = true;
+                    document.getElementById("subscribeButton").style.backgroundColor = "#cccccc";
+                });
+        }
+     
         // Call this at the beginning to hide progress bar initially
         toggleProgressBar(false);
                 function startCountdown(testType) {
@@ -1041,6 +1088,21 @@
             `;
             
             document.getElementById("restartButton").style.display = "block";
+            // Add the email subscription form to the results section
+            document.getElementById("result").innerHTML += `
+                <div id="emailSubscriptionSection" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                    <p><strong>Stay on Track with Your Cognitive Health</strong></p>
+                    <p style="font-size: 14px; margin-bottom: 15px;">Enter your email to receive reminders to complete this test regularly. We'll only send you reminders - nothing else!</p>
+                    <div style="display: flex; margin-bottom: 10px;">
+                        <input type="email" id="reminderEmail" placeholder="Your email address" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px;">
+                        <button id="subscribeButton" style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 0 15px; cursor: pointer;">Subscribe</button>
+                    </div>
+                    <p id="subscriptionMessage" style="font-size: 14px; margin-top: 10px; display: none;"></p>
+                </div>
+            `;
+
+            // Add the event listener for the subscribe button
+            document.getElementById("subscribeButton").addEventListener("click", subscribeToReminders);
             document.getElementById("progressBar").style.width = "100%";
         }
         
