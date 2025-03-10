@@ -253,19 +253,152 @@
         <button id="touchscreenButton">Touchscreen Device</button>
     </div>
     <div id="instructionsScreen" class="instruction-screen" style="display: none;">
-        <p><strong>Section 1</strong></p>
-        <p>Identify the direction of the center arrow and ignore the surrounding ones.</p>
-        <button id="understoodButton">Continue</button>
+        <p><strong>Section 1: Arrow Direction Task</strong></p>
+        <div style="margin: 20px 0;">
+            <p style="font-weight: 400; margin-bottom: 15px;">In this task:</p>
+            <ol style="text-align: left; line-height: 1.6;">
+                <li><span style="font-weight: 400;">Focus on the <span style="color: #f4634c; text-decoration: underline;">center arrow</span> and ignore the surrounding ones</span></li>
+                <li><span style="font-weight: 400;">Press the arrow key that matches the direction of the center arrow</span></li>
+                <li><span style="font-weight: 400;">Respond as <span style="color: #f4634c; font-weight: 400;">quickly and accurately</span> as possible</span></li>
+            </ol>
+        </div>
+
+        <div style="margin: 25px 0; background-color: #f8f8f8; padding: 15px; border-radius: 4px;">
+            <p style="font-weight: 400; margin-bottom: 10px;">Examples:</p>
+
+            <div style="display: flex; justify-content: space-between; margin: 15px 0;">
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">→ →</span> <span style="color: #f4634c; font-weight: bold;">→</span> <span style="color: #888;">→ →</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">→</span> key
+                    </div>
+                </div>
+
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">← ←</span> <span style="color: #f4634c; font-weight: bold;">→</span> <span style="color: #888;">← ←</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">→</span> key
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin: 15px 0;">
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">← ←</span> <span style="color: #f4634c; font-weight: bold;">←</span> <span style="color: #888;">← ←</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">←</span> key
+                    </div>
+                </div>
+
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">→ →</span> <span style="color: #f4634c; font-weight: bold;">←</span> <span style="color: #888;">→ →</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">←</span> key
+                    </div>
+                </div>
+            </div>
+          <button id="understoodButton">Continue</button>
+        </div>
+
+        <div style="margin: 20px 0; padding: 12px; background-color: #fff4f2; border-left: 4px solid #f4634c; font-weight: 400;">
+            Speed matters! Your reaction time will be measured.
+        </div>
+    </div>  
+  
+      <div id="reversedInstructionsScreen" class="instruction-screen" style="display: none;">
+        <p><strong>Section 2: Reversed Arrow Task</strong></p>
+        <div style="margin: 20px 0;">
+            <p style="font-weight: 400; margin-bottom: 15px;">In this task:</p>
+            <ol style="text-align: left; line-height: 1.6;">
+                <li><span style="font-weight: 400;">Focus on the <span style="color: #f4634c; text-decoration: underline;">center arrow</span> and ignore the surrounding ones</span></li>
+                <li><span style="font-weight: 400;">Press the <span style="color: #f4634c; font-weight: 400;">OPPOSITE</span> arrow key to the direction of the center arrow</span></li>
+                <li><span style="font-weight: 400;">Respond as <span style="color: #f4634c; font-weight: 400;">quickly and accurately</span> as possible</span></li>
+            </ol>
+        </div>
+
+        <div style="margin: 25px 0; background-color: #f8f8f8; padding: 15px; border-radius: 4px;">
+            <p style="font-weight: 400; margin-bottom: 10px;">Examples:</p>
+
+            <div style="display: flex; justify-content: space-between; margin: 15px 0;">
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">→ →</span> <span style="color: #f4634c; font-weight: bold;">→</span> <span style="color: #888;">→ →</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">←</span> key (opposite)
+                    </div>
+                </div>
+
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">← ←</span> <span style="color: #f4634c; font-weight: bold;">→</span> <span style="color: #888;">← ←</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">←</span> key (opposite)
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin: 15px 0;">
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">← ←</span> <span style="color: #f4634c; font-weight: bold;">←</span> <span style="color: #888;">← ←</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">→</span> key (opposite)
+                    </div>
+                </div>
+
+                <div style="text-align: center; width: 48%;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">
+                        <span style="color: #888;">→ →</span> <span style="color: #f4634c; font-weight: bold;">←</span> <span style="color: #888;">→ →</span>
+                    </div>
+                    <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3;">
+                        Press <span style="font-weight: bold;">→</span> key (opposite)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin: 20px 0; padding: 12px; background-color: #fff4f2; border-left: 4px solid #f4634c; font-weight: 400;">
+            Remember: Press the OPPOSITE arrow key and respond as quickly as possible!
+        </div>
+
+        <button id="understoodReversedButton">Start Test</button>
     </div>
-    <div id="reversedInstructionsScreen" class="instruction-screen" style="display: none;">
-        <p><strong>Section 2</strong></p>
-        <p>For this task, you need to press the opposite arrow key to the direction of the center arrow.</p>
-        <button id="understoodReversedButton">Continue</button>
-    </div>
+  
     <div id="alertingInstructionsScreen" class="instruction-screen" style="display: none;">
-        <p><strong>Section 3</strong></p>
-        <p>Press the spacebar as soon as you see the dot appear.</p>
-        <button id="understoodAlertingButton">Continue</button>
+        <p><strong>Section 3: Reaction Speed Test</strong></p>
+        <div style="margin: 20px 0;">
+            <p style="font-weight: 400; margin-bottom: 15px;">In this task:</p>
+            <ol style="text-align: left; line-height: 1.6;">
+                <li><span style="font-weight: 400;">Keep your eyes on the center of the screen</span></li>
+                <li><span style="font-weight: 400;">When you see the dot (●) appear, press the <span style="color: #f4634c; font-weight: 400;">spacebar</span> as quickly as possible</span></li>
+                <li><span style="font-weight: 400;">Only press when you see the dot - <span style="color: #f4634c; font-weight: 400;">avoid pressing</span> at other times</span></li>
+            </ol>
+        </div>
+
+        <div style="margin: 25px 0; background-color: #f8f8f8; padding: 15px; border-radius: 4px; text-align: center;">
+            <p style="font-weight: 400; margin-bottom: 15px;">Example:</p>
+            <div style="font-size: 60px; margin: 20px 0; color: #f4634c;">●</div>
+            <div style="background-color: #e6f7e6; padding: 8px; border-radius: 3px; border: 1px solid #c3e6c3; max-width: 250px; margin: 0 auto;">
+                Press <span style="font-weight: bold;">spacebar</span> immediately
+            </div>
+        </div>
+
+        <div style="margin: 20px 0; padding: 12px; background-color: #fff4f2; border-left: 4px solid #f4634c; font-weight: 400;">
+            Your goal is to react as quickly as possible when the dot appears!
+        </div>
+
+        <button id="understoodAlertingButton">Start Test</button>
     </div>
     <div id="alertingTestScreen" style="display: none;">
         <p id="alertingStimulus">●</p>
@@ -343,13 +476,18 @@
             document.getElementById("touchButtonsContainer").style.display = "none";
             showInstructions();
         });
+
+      
+      
         document.getElementById("touchscreenButton").addEventListener("click", function() {
             isTouchDevice = true;
             document.getElementById("deviceSelectionScreen").style.display = "none";
-            document.getElementById("touchButtonsContainer").style.display = "block";
+            // Remove this line to prevent immediate display of touch buttons
+            // document.getElementById("touchButtonsContainer").style.display = "block";
             document.getElementById("spaceButton").style.display = "none";
             showInstructions();
         });
+      
         document.getElementById("leftButton").addEventListener("click", function() {
             if (currentPhase === "flanker") {
                 handleArrowPress("ArrowLeft");
@@ -446,6 +584,9 @@
         function startFlankerTest() {
             document.getElementById("arrowContainer").style.display = "block";
             if (isTouchDevice) {
+                document.getElementById("touchButtonsContainer").style.display = "block";
+            }
+            if (isTouchDevice) {
                 document.getElementById("spaceButton").style.display = "none";
                 document.getElementById("leftButton").style.display = "inline-flex";
                 document.getElementById("rightButton").style.display = "inline-flex";
@@ -508,12 +649,19 @@
             }
             document.addEventListener("keydown", keyPressHandler);
         }
+      
         function showReversedFlankerInstructions() {
             currentPhase = "reversed";
+            if (isTouchDevice) {
+                document.getElementById("touchButtonsContainer").style.display = "none";
+            }
             document.getElementById("reversedInstructionsScreen").style.display = "block";
         }
         function startReversedFlankerTest() {
             document.getElementById("arrowContainer").style.display = "block";
+            if (isTouchDevice) {
+                document.getElementById("touchButtonsContainer").style.display = "block";
+            }
             if (isTouchDevice) {
                 document.getElementById("spaceButton").style.display = "none";
                 document.getElementById("leftButton").style.display = "inline-flex";
@@ -575,8 +723,13 @@
             }
             document.addEventListener("keydown", keyPressHandler);
         }
+
+      
         function showAlertingInstructions() {
             currentPhase = "alerting";
+            if (isTouchDevice) {
+                document.getElementById("touchButtonsContainer").style.display = "none";
+            }
             document.getElementById("alertingInstructionsScreen").style.display = "block";
             spacebarPressCount = 0;
             if (isTouchDevice) {
@@ -587,9 +740,15 @@
                     "Tap the button as soon as you see the dot appear.";
             }
         }
+      
+      
+      
         function startAlertingTest() {
             document.getElementById("alertingTestScreen").style.display = "block";
             alertingTestStarted = true;
+            if (isTouchDevice) {
+                document.getElementById("touchButtonsContainer").style.display = "block";
+            }
             if (!isTouchDevice) {
                 document.addEventListener("keydown", trackKeyboardSpacebarPresses);
             }
