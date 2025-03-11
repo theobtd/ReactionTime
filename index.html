@@ -1119,23 +1119,48 @@
                 recommendationsHTML += `<li>${rec}</li>`;
             });
             
+          
             // Display the results with the risk assessment
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
                 <style>
-                    .risk-badge {
-                        display: inline-block;
-                        padding: 7px 18px;
-                        border-radius: 25px;
-                        color: white;
+                    .risk-continuum {
+                        width: 100%;
+                        height: 40px;
+                        background: linear-gradient(to right, #4CAF50, #FF9800, #F44336);
+                        border-radius: 20px;
+                        position: relative;
+                        margin: 25px 0;
+                    }
+                    .risk-pointer {
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        border-left: 10px solid transparent;
+                        border-right: 10px solid transparent;
+                        border-bottom: 15px solid #333;
+                        bottom: 100%;
+                        transform: translateX(-50%);
+                    }
+                    .risk-labels {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top: 5px;
                         font-weight: 500;
-                        margin-bottom: 17px;
+                    }
+                    .risk-label {
+                        text-align: center;
+                        width: 33.33%;
+                    }
+                    .risk-level-text {
                         font-size: 24px;
-                        letter-spacing: 0.05em;
+                        font-weight: 500;
+                        color: ${riskAssessment.color};
+                        margin-bottom: 10px;
                     }
                     .recommendations {
                         text-align: left;
-                        margin-top: 15px;
+                        margin-top: 25px;
                     }
                     .recommendations ul {
                         padding-left: 20px;
@@ -1144,21 +1169,24 @@
                         margin-bottom: 10px;
                         line-height: 1.4;
                     }
-                    .indicators {
-                        text-align: left;
-                        margin-top: 15px;
-                    }
-                    .indicators ul {
-                        padding-left: 20px;
-                    }
                 </style>
                 <p><strong>Thank You</strong></p>
                 <p>Your assessment has been completed successfully.</p>
-                <div>
-                    <span class="risk-badge" style="background-color: ${riskAssessment.color};">
-                        ${riskAssessment.level}
-                    </span>
+
+                <div class="risk-level-text">${riskAssessment.level}</div>
+
+                <div class="risk-continuum">
+                    <div class="risk-pointer" style="left: ${
+                        riskAssessment.level === "Low Risk" ? "16.67%" : 
+                        riskAssessment.level === "Medium Risk" ? "50%" : "83.33%"
+                    };"></div>
                 </div>
+                <div class="risk-labels">
+                    <div class="risk-label">Low Risk</div>
+                    <div class="risk-label">Medium Risk</div>
+                    <div class="risk-label">High Risk</div>
+                </div>
+
                 <div class="recommendations">
                     <p><strong>Recommendations:</strong></p>
                     <ul>
@@ -1166,6 +1194,7 @@
                     </ul>
                 </div>
             `;
+          
             
             document.getElementById("restartButton").style.display = "block";
             // Add the email subscription form to the results section
