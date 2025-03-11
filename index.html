@@ -147,8 +147,11 @@
             position: fixed;
             bottom: 60px;
             left: 0;
+            right: 0;
             width: 100%;
             padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
         }
         .touch-button {
             width: 45%;
@@ -163,6 +166,8 @@
             transform: none !important;
             box-shadow: none !important;
             transition: none !important;
+            position: relative;
+            max-width: 200px;
         }
         .touch-button:hover, .touch-button:active, .touch-button.active {
             background-color: #f4634c !important;
@@ -172,6 +177,7 @@
         }
         #spaceButton {
             width: 90%;
+            max-width: 400px;
             height: 70px;
             font-size: 24px;
             display: none;
@@ -180,6 +186,7 @@
             transform: none !important;
             box-shadow: none !important;
             transition: none !important;
+            margin: 0 auto;
         }
         #spaceButton:hover, #spaceButton:active {
             background-color: #f4634c !important;
@@ -226,6 +233,38 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+      
+        
+        /* Add these media queries for better mobile responsiveness */
+        @media (max-width: 480px) {
+            #arrowContainer {
+                font-size: 40px;
+                /* Center the arrows container */
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100%;
+            }
+
+            .instruction-screen, #result {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+
+        /* Add this to ensure content is centered on all devices */
+        @media (max-height: 700px) {
+            body {
+                padding: 80px 0 80px 0;
+            }
+
+            h1 {
+                top: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -250,7 +289,7 @@
         <input type="text" id="participantId" class="input-field" placeholder="Participant ID - If any">
 
         <div id="disclaimerContainer" style="margin: 20px 0; padding: 15px; background-color: #f8f8f8; border-radius: 4px; border-left: 4px solid #4682B4; text-align: left;">
-            <p style="font-weight: bold; margin-bottom: 10px;">Medical/Legal Disclaimer</p>
+            <p style="font-weight: bold; margin-bottom: 10px;">Disclaimer</p>
             <p style="font-size: 14px; line-height: 1.5; margin-bottom: 15px;">
                 This cognitive assessment is intended for informational purposes only and is not a clinical diagnostic tool. Results should not be interpreted as medical advice. CogniLab does not provide medical diagnoses, treatment recommendations, or other medical services. If you have concerns about your cognitive health, please consult with a qualified healthcare professional.
             </p>
@@ -496,17 +535,17 @@
             document.getElementById("touchButtonsContainer").style.display = "none";
             showInstructions();
         });
-
-      
       
         document.getElementById("touchscreenButton").addEventListener("click", function() {
             isTouchDevice = true;
             document.getElementById("deviceSelectionScreen").style.display = "none";
-            // Remove this line to prevent immediate display of touch buttons
-            // document.getElementById("touchButtonsContainer").style.display = "block";
+            // Don't display touch buttons yet - they'll be shown when needed
+            document.getElementById("touchButtonsContainer").style.display = "none";
             document.getElementById("spaceButton").style.display = "none";
             showInstructions();
         });
+      
+      
       
         document.getElementById("leftButton").addEventListener("click", function() {
             if (currentPhase === "flanker") {
@@ -1086,12 +1125,12 @@
                 <style>
                     .risk-badge {
                         display: inline-block;
-                        padding: 5px 12px;
-                        border-radius: 20px;
+                        padding: 7px 18px;
+                        border-radius: 25px;
                         color: white;
-                        font-weight: 400;
-                        margin-bottom: 15px;
-                        font-size: 16px;
+                        font-weight: 500;
+                        margin-bottom: 17px;
+                        font-size: 24px;
                         letter-spacing: 0.05em;
                     }
                     .recommendations {
