@@ -162,13 +162,8 @@
     <script>
         function toggleVisibility(id) {
             const element = document.getElementById(id);
-            if (element.classList.contains('hidden')) {
-                element.classList.remove('hidden');
-                element.classList.add('visible');
-            } else {
-                element.classList.remove('visible');
-                element.classList.add('hidden');
-            }
+            element.classList.toggle('hidden'); // Toggle class directly
+            element.classList.toggle('visible'); // Toggle visibility class
         }
     </script>
 </body>
