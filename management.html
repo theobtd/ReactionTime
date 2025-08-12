@@ -24,28 +24,18 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .dendrogram {
-            list-style-type: none;
-            padding: 0;
-        }
-        .dendrogram > li {
-            margin: 15px 0;
-        }
-        .office-name {
-            font-weight: bold;
-            font-size: 24px;
-            color: #f4634c;
-        }
-        .team {
-            margin-left: 20px;
+        .card {
             background-color: #f0f0f0;
             border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .team-name {
+        .card:hover {
+            background-color: #e0e0e0;
+        }
+        .team-name, .office-name {
             font-weight: bold;
         }
         .stress-score {
@@ -60,73 +50,96 @@
         .score-3 { background-color: #ffeb3b; color: black; } /* Yellow */
         .score-4 { background-color: #4caf50; } /* Green */
         .score-5 { background-color: #388e3c; } /* Dark Green */
+        .hidden {
+            display: none;
+        }
+        .nested {
+            padding-left: 20px; /* Indent nested items */
+        }
     </style>
 </head>
 <body>
     <h1>Team Stress Levels</h1>
     <div class="container">
-        <ul class="dendrogram">
-            <li>Company
-                <ul>
-                    <li class="office-name">New York City Office
-                        <ul>
-                            <li class="team">
-                                <div class="team-name">Investment Management</div>
-                                <div class="stress-score score-4">4/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Investment Banking</div>
-                                <div class="stress-score score-3">3.5/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Emerging Technology</div>
-                                <div class="stress-score score-3">3/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Global & Private Market</div>
-                                <div class="stress-score score-5">4.5/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Mid- & Back-Office</div>
-                                <div class="stress-score score-2">2.5/5</div>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="office-name">London Office
-                        <ul>
-                            <li class="team">
-                                <div class="team-name">Investment Management</div>
-                                <div class="stress-score score-4">3.8/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Investment Banking</div>
-                                <div class="stress-score score-3">3.2/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Emerging Technology</div>
-                                <div class="stress-score score-2">2/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Global & Private Market</div>
-                                <div class="stress-score score-4">4.2/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Mid- & Back-Office</div>
-                                <div class="stress-score score-3">2.8/5</div>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="office-name">Hong Kong Office
-                        <ul>
-                            <li class="team">
-                                <div class="team-name">Global & Private Market</div>
-                                <div class="stress-score score-5">4.5/5</div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <div class="card" onclick="toggleVisibility('company')">
+            <div class="team-name">Company</div>
+            <div class="stress-score score-4">4/5</div> <!-- Example aggregated score -->
+        </div>
+        <div id="company" class="hidden nested">
+            <div class="card" onclick="toggleVisibility('nyc')">
+                <div class="office-name">New York City Office</div>
+                <div class="stress-score score-4">4/5</div> <!-- Example aggregated score -->
+            </div>
+            <div id="nyc" class="hidden nested">
+                <div class="card">
+                    <div class="team-name">Investment Management</div>
+                    <div class="stress-score score-4">4/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Investment Banking</div>
+                    <div class="stress-score score-3">3.5/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Emerging Technology</div>
+                    <div class="stress-score score-3">3/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Global & Private Market</div>
+                    <div class="stress-score score-5">4.5/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Mid- & Back-Office</div>
+                    <div class="stress-score score-2">2.5/5</div>
+                </div>
+            </div>
+            <div class="card" onclick="toggleVisibility('london')">
+                <div class="office-name">London Office</div>
+                <div class="stress-score score-4">3.8/5</div> <!-- Example aggregated score -->
+            </div>
+            <div id="london" class="hidden nested">
+                <div class="card">
+                    <div class="team-name">Investment Management</div>
+                    <div class="stress-score score-4">3.8/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Investment Banking</div>
+                    <div class="stress-score score-3">3.2/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Emerging Technology</div>
+                    <div class="stress-score score-2">2/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Global & Private Market</div>
+                    <div class="stress-score score-4">4.2/5</div>
+                </div>
+                <div class="card">
+                    <div class="team-name">Mid- & Back-Office</div>
+                    <div class="stress-score score-3">2.8/5</div>
+                </div>
+            </div>
+            <div class="card" onclick="toggleVisibility('hongkong')">
+                <div class="office-name">Hong Kong Office</div>
+                <div class="stress-score score-5">4.5/5</div> <!-- Example aggregated score -->
+            </div>
+            <div id="hongkong" class="hidden nested">
+                <div class="card">
+                    <div class="team-name">Global & Private Market</div>
+                    <div class="stress-score score-5">4.5/5</div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        function toggleVisibility(id) {
+            const element = document.getElementById(id);
+            if (element.classList.contains('hidden')) {
+                element.classList.remove('hidden');
+            } else {
+                element.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
