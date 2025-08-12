@@ -3,127 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Management Page</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Family Tree with Vis.js</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fbebdc;
-            color: #333;
-            margin: 0;
-            padding: 20px;
+        #mynetwork {
+            width: 800px;
+            height: 600px;
+            border: 1px solid lightgray;
         }
-        h1 {
-            text-align: center;
-            color: #f4634c;
-        }
-        .node {
-            cursor: pointer;
-            text-align: center;
-        }
-        .team-name, .office-name {
-            font-weight: bold;
-        }
-        .stress-score {
-            font-size: 12px;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: white;
-        }
-        .score-1 { background-color: #f44336; } /* Red */
-        .score-2 { background-color: #ff9800; } /* Orange */
-        .score-3 { background-color: #ffeb3b; color: black; } /* Yellow */
-        .score-4 { background-color: #4caf50; } /* Green */
-        .score-5 { background-color: #388e3c; } /* Dark Green */
     </style>
 </head>
 <body>
-    <h1>Team Stress Levels</h1>
-    <svg width="800" height="600"></svg>
+    <h1 style="text-align:center;">Family Tree</h1>
+    <div id="mynetwork"></div>
 
     <script>
-        const data = {
-            name: "Company",
-            children: [
-                {
-                    name: "New York City Office",
-                    children: [
-                        { name: "Investment Management", score: "4/5", class: "score-4" },
-                        { name: "Investment Banking", score: "3.5/5", class: "score-3" },
-                        { name: "Emerging Technology", score: "3/5", class: "score-3" },
-                        { name: "Global & Private Market", score: "4.5/5", class: "score-5" },
-                        { name: "Mid- & Back-Office", score: "2.5/5", class: "score-2" }
-                    ]
-                },
-                {
-                    name: "London Office",
-                    children: [
-                        { name: "Investment Management", score: "3.8/5", class: "score-4" },
-                        { name: "Investment Banking", score: "3.2/5", class: "score-3" },
-                        { name: "Emerging Technology", score: "2/5", class: "score-2" },
-                        { name: "Global & Private Market", score: "4.2/5", class: "score-4" },
-                        { name: "Mid- & Back-Office", score: "2.8/5", class: "score-3" }
-                    ]
-                },
-                {
-                    name: "Hong Kong Office",
-                    children: [
-                        { name: "Global & Private Market", score: "4.5/5", class: "score-5" }
-                    ]
+        // Create an array with nodes
+        var nodes = new vis.DataSet([
+            {id: 1, label: 'Company'},
+            {id: 2, label: 'New York City Office'},
+            {id: 3, label: 'London Office'},
+            {id: 4, label: 'Hong Kong Office'},
+            {id: 5, label: 'Investment Management'},
+            {id: 6, label: 'Investment Banking'},
+            {id: 7, label: 'Emerging Technology'},
+            {id: 8, label: 'Global & Private Market'},
+            {id: 9, label: 'Mid- & Back-Office'},
+            // Add other nodes as needed
+        ]);
+
+        // Create an array with edges
+        var edges = new vis.DataSet([
+            {from: 1, to: 2},
+            {from: 1, to: 3},
+            {from: 1, to: 4},
+            {from: 2, to: 5},
+            {from: 2, to: 6},
+            {from: 2, to: 7},
+            {from: 2, to: 8},
+            {from: 2, to: 9},
+            // Add other edges as needed
+        ]);
+
+        // Specify options
+        var options = {
+            layout: {
+                hierarchical: {
+                    direction: 'UD', // 'UD' for top to bottom
                 }
-            ]
+            },
+            physics: false
         };
 
-        const svg = d3.select("svg"),
-              width = +svg.attr("width"),
-              height = +svg.attr("height");
-
-        const treeLayout = d3.tree().size([height - 100, width - 100]); // Set layout to grow vertically
-        const root = d3.hierarchy(data);
-        treeLayout(root);
-
-        // Links
-        svg.append("g")
-            .attr("transform", "translate(50,50)")
-            .selectAll(".link")
-            .data(root.links())
-            .enter().append("line")
-            .attr("class", "link")
-            .attr("x1", d => d.source.y + 50) // Use y for horizontal position
-            .attr("y1", d => d.source.x + 50) // Use x for vertical position
-            .attr("x2", d => d.target.y + 50)
-            .attr("y2", d => d.target.x + 50)
-            .style("stroke", "#ccc");
-
-        // Nodes
-        const node = svg.append("g")
-            .attr("transform", "translate(50,50)")
-            .selectAll(".node")
-            .data(root.descendants())
-            .enter().append("g")
-            .attr("class", "node")
-            .attr("transform", d => `translate(${d.y + 50},${d.x + 50})`); // Correctly position nodes
-
-        node.append("rect")
-            .attr("width", 150)
-            .attr("height", 30)
-            .attr("rx", 5)
-            .attr("class", d => d.data.class)
-            .attr("fill", "#f0f0f0")
-            .attr("stroke", "#ccc");
-
-        node.append("text")
-            .attr("dy", "1.5em")
-            .attr("x", 75)
-            .attr("text-anchor", "middle")
-            .text(d => d.data.name);
-
-        node.append("text")
-            .attr("dy", "3em")
-            .attr("x", 75)
-            .attr("text-anchor", "middle")
-            .text(d => d.data.score);
+        // Create a network
+        var container = document.getElementById('mynetwork');
+        var data = {nodes: nodes, edges: edges};
+        var network = new vis.Network(container, data, options);
     </script>
 </body>
 </html>
