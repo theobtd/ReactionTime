@@ -204,57 +204,69 @@
             const chartId = 'chart_' + team; // Unique canvas ID
             const ctx = document.getElementById(chartId).getContext('2d');
             const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
-
-            // Hide any existing chart containers
-            const allChartContainers = document.querySelectorAll('.chartContainer');
-            allChartContainers.forEach(container => {
-                container.style.display = 'none';
-            });
-
-            // Destroy existing chart instance if it exists
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
-
-            // Create the chart
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Stress Levels',
-                        data: data,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderWidth: 2,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            min: 0, // Set minimum value
-                            max: 5, // Set maximum value
-                            title: {
-                                display: true,
-                                text: 'Stress Level (0-5)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Time'
+        
+            // Get the specific chart container
+            const chartContainer = cardElement.nextElementSibling;
+        
+            // Check if the chart is currently visible
+            if (chartContainer.style.display === 'block') {
+                // Hide the chart container and destroy the chart instance
+                chartContainer.style.display = 'none';
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null; // Reset the chart instance
+                }
+            } else {
+                // Hide any existing chart containers
+                const allChartContainers = document.querySelectorAll('.chartContainer');
+                allChartContainers.forEach(container => {
+                    container.style.display = 'none';
+                });
+        
+                // Destroy existing chart instance if it exists
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+        
+                // Create the chart
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Stress Levels',
+                            data: data,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                min: 0, // Set minimum value
+                                max: 5, // Set maximum value
+                                title: {
+                                    display: true,
+                                    text: 'Stress Level (0-5)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
                             }
                         }
                     }
-                }
-            });
-
-            // Show the specific chart container
-            const chartContainer = cardElement.nextElementSibling;
-            chartContainer.style.display = 'block';
+                });
+        
+                // Show the specific chart container
+                chartContainer.style.display = 'block';
+            }
         }
     </script>
 </body>
