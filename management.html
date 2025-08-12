@@ -24,109 +24,123 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .dendrogram {
-            list-style-type: none;
-            padding: 0;
-        }
-        .dendrogram > li {
-            margin: 15px 0;
+        .office {
+            margin-bottom: 20px;
         }
         .office-name {
             font-weight: bold;
             font-size: 24px;
-            color: #f4634c;
+            margin-bottom: 10px;
         }
         .team {
             margin-left: 20px;
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-bottom: 10px;
         }
-        .team-name {
-            font-weight: bold;
+        .stress-bar {
+            background-color: #f4634c;
+            border-radius: 5px;
+            height: 20px;
+            width: 0;
+            transition: width 0.3s ease;
         }
         .stress-score {
-            font-size: 20px;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: white;
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
         }
-        .score-1 { background-color: #f44336; } /* Red */
-        .score-2 { background-color: #ff9800; } /* Orange */
-        .score-3 { background-color: #ffeb3b; color: black; } /* Yellow */
-        .score-4 { background-color: #4caf50; } /* Green */
-        .score-5 { background-color: #388e3c; } /* Dark Green */
     </style>
 </head>
 <body>
     <h1>Team Stress Levels</h1>
     <div class="container">
-        <ul class="dendrogram">
-            <li>Company
-                <ul>
-                    <li class="office-name">New York City Office
-                        <ul>
-                            <li class="team">
-                                <div class="team-name">Investment Management</div>
-                                <div class="stress-score score-4">4/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Investment Banking</div>
-                                <div class="stress-score score-3">3.5/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Emerging Technology</div>
-                                <div class="stress-score score-3">3/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Global & Private Market</div>
-                                <div class="stress-score score-5">4.5/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Mid- & Back-Office</div>
-                                <div class="stress-score score-2">2.5/5</div>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="office-name">London Office
-                        <ul>
-                            <li class="team">
-                                <div class="team-name">Investment Management</div>
-                                <div class="stress-score score-4">3.8/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Investment Banking</div>
-                                <div class="stress-score score-3">3.2/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Emerging Technology</div>
-                                <div class="stress-score score-2">2/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Global & Private Market</div>
-                                <div class="stress-score score-4">4.2/5</div>
-                            </li>
-                            <li class="team">
-                                <div class="team-name">Mid- & Back-Office</div>
-                                <div class="stress-score score-3">2.8/5</div>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="office-name">Hong Kong Office
-                        <ul>
-                            <li class="team">
-                                <div class="team-name">Global & Private Market</div>
-                                <div class="stress-score score-5">4.5/5</div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <div class="office">
+            <div class="office-name">New York City Office</div>
+            <div class="team">
+                <div>Investment Management</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 80%;"></div>
+                    <span>4/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Investment Banking</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 70%;"></div>
+                    <span>3.5/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Emerging Technology</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 60%;"></div>
+                    <span>3/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Global & Private Market</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 90%;"></div>
+                    <span>4.5/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Mid- & Back-Office</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 50%;"></div>
+                    <span>2.5/5</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="office">
+            <div class="office-name">London Office</div>
+            <div class="team">
+                <div>Investment Management</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 75%;"></div>
+                    <span>3.8/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Investment Banking</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 65%;"></div>
+                    <span>3.2/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Emerging Technology</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 40%;"></div>
+                    <span>2/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Global & Private Market</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 85%;"></div>
+                    <span>4.2/5</span>
+                </div>
+            </div>
+            <div class="team">
+                <div>Mid- & Back-Office</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 55%;"></div>
+                    <span>2.8/5</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="office">
+            <div class="office-name">Hong Kong Office</div>
+            <div class="team">
+                <div>Global & Private Market</div>
+                <div class="stress-score">
+                    <div class="stress-bar" style="width: 90%;"></div>
+                    <span>4.5/5</span>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
