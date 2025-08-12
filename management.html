@@ -81,79 +81,85 @@
             height: 50%;
             background-color: #ccc;
         }
+        .offices-container {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
     <h1>Team Stress Levels</h1>
     <div class="container">
-        <div class="card" onclick="toggleVisibility('company')">
-            <div class="team-name">Company</div>
-            <div class="stress-score score-4">4/5</div>
-            <div class="tree-line"></div>
-        </div>
-        <div id="company" class="nested">
-            <div class="card" onclick="toggleVisibility('nyc')">
-                <div class="office-name">New York City Office</div>
+        <div class="offices-container">
+            <div class="card" onclick="toggleVisibility('company')">
+                <div class="team-name">Company</div>
                 <div class="stress-score score-4">4/5</div>
                 <div class="tree-line"></div>
             </div>
-            <div id="nyc" class="nested">
-                <div class="card">
-                    <div class="team-name">Investment Management</div>
+            <div id="company" class="nested">
+                <div class="card" onclick="toggleVisibility('nyc')">
+                    <div class="office-name">New York City Office</div>
                     <div class="stress-score score-4">4/5</div>
+                    <div class="tree-line"></div>
                 </div>
-                <div class="card">
-                    <div class="team-name">Investment Banking</div>
-                    <div class="stress-score score-3">3.5/5</div>
+                <div id="nyc" class="nested">
+                    <div class="card">
+                        <div class="team-name">Investment Management</div>
+                        <div class="stress-score score-4">4/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Investment Banking</div>
+                        <div class="stress-score score-3">3.5/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Emerging Technology</div>
+                        <div class="stress-score score-3">3/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Global & Private Market</div>
+                        <div class="stress-score score-5">4.5/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Mid- & Back-Office</div>
+                        <div class="stress-score score-2">2.5/5</div>
+                    </div>
                 </div>
-                <div class="card">
-                    <div class="team-name">Emerging Technology</div>
-                    <div class="stress-score score-3">3/5</div>
-                </div>
-                <div class="card">
-                    <div class="team-name">Global & Private Market</div>
-                    <div class="stress-score score-5">4.5/5</div>
-                </div>
-                <div class="card">
-                    <div class="team-name">Mid- & Back-Office</div>
-                    <div class="stress-score score-2">2.5/5</div>
-                </div>
-            </div>
-            <div class="card" onclick="toggleVisibility('london')">
-                <div class="office-name">London Office</div>
-                <div class="stress-score score-4">3.8/5</div>
-                <div class="tree-line"></div>
-            </div>
-            <div id="london" class="nested">
-                <div class="card">
-                    <div class="team-name">Investment Management</div>
+                <div class="card" onclick="toggleVisibility('london')">
+                    <div class="office-name">London Office</div>
                     <div class="stress-score score-4">3.8/5</div>
+                    <div class="tree-line"></div>
                 </div>
-                <div class="card">
-                    <div class="team-name">Investment Banking</div>
-                    <div class="stress-score score-3">3.2/5</div>
+                <div id="london" class="nested">
+                    <div class="card">
+                        <div class="team-name">Investment Management</div>
+                        <div class="stress-score score-4">3.8/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Investment Banking</div>
+                        <div class="stress-score score-3">3.2/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Emerging Technology</div>
+                        <div class="stress-score score-2">2/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Global & Private Market</div>
+                        <div class="stress-score score-4">4.2/5</div>
+                    </div>
+                    <div class="card">
+                        <div class="team-name">Mid- & Back-Office</div>
+                        <div class="stress-score score-3">2.8/5</div>
+                    </div>
                 </div>
-                <div class="card">
-                    <div class="team-name">Emerging Technology</div>
-                    <div class="stress-score score-2">2/5</div>
-                </div>
-                <div class="card">
-                    <div class="team-name">Global & Private Market</div>
-                    <div class="stress-score score-4">4.2/5</div>
-                </div>
-                <div class="card">
-                    <div class="team-name">Mid- & Back-Office</div>
-                    <div class="stress-score score-3">2.8/5</div>
-                </div>
-            </div>
-            <div class="card" onclick="toggleVisibility('hongkong')">
-                <div class="office-name">Hong Kong Office</div>
-                <div class="stress-score score-5">4.5/5</div>
-            </div>
-            <div id="hongkong" class="nested">
-                <div class="card">
-                    <div class="team-name">Global & Private Market</div>
+                <div class="card" onclick="toggleVisibility('hongkong')">
+                    <div class="office-name">Hong Kong Office</div>
                     <div class="stress-score score-5">4.5/5</div>
+                </div>
+                <div id="hongkong" class="nested">
+                    <div class="card">
+                        <div class="team-name">Global & Private Market</div>
+                        <div class="stress-score score-5">4.5/5</div>
+                    </div>
                 </div>
             </div>
         </div>
