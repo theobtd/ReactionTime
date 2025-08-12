@@ -56,6 +56,14 @@
         .nested {
             padding-left: 20px; /* Indent nested items */
         }
+        #chartContainer {
+            margin-top: 20px;
+            display: none;
+        }
+        canvas {
+            max-width: 100%;
+            height: 300px;
+        }
     </style>
 </head>
 <body>
@@ -63,75 +71,93 @@
     <div class="container">
         <div class="card" onclick="toggleVisibility('company')">
             <div class="team-name">Company</div>
-            <div class="stress-score score-4">4/5</div> <!-- Example aggregated score -->
+            <div class="stress-score score-4">4/5</div>
         </div>
         <div id="company" class="hidden nested">
             <div class="card" onclick="toggleVisibility('nyc')">
                 <div class="office-name">New York City Office</div>
-                <div class="stress-score score-4">4/5</div> <!-- Example aggregated score -->
+                <div class="stress-score score-4">4/5</div>
             </div>
             <div id="nyc" class="hidden nested">
-                <div class="card">
+                <div class="card" onclick="showChart('investmentManagement')">
                     <div class="team-name">Investment Management</div>
                     <div class="stress-score score-4">4/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('investmentBanking')">
                     <div class="team-name">Investment Banking</div>
                     <div class="stress-score score-3">3.5/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('emergingTechnology')">
                     <div class="team-name">Emerging Technology</div>
                     <div class="stress-score score-3">3/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('globalPrivateMarket')">
                     <div class="team-name">Global & Private Market</div>
                     <div class="stress-score score-5">4.5/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('midBackOffice')">
                     <div class="team-name">Mid- & Back-Office</div>
                     <div class="stress-score score-2">2.5/5</div>
                 </div>
             </div>
             <div class="card" onclick="toggleVisibility('london')">
                 <div class="office-name">London Office</div>
-                <div class="stress-score score-4">3.8/5</div> <!-- Example aggregated score -->
+                <div class="stress-score score-4">3.8/5</div>
             </div>
             <div id="london" class="hidden nested">
-                <div class="card">
+                <div class="card" onclick="showChart('investmentManagementLondon')">
                     <div class="team-name">Investment Management</div>
                     <div class="stress-score score-4">3.8/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('investmentBankingLondon')">
                     <div class="team-name">Investment Banking</div>
                     <div class="stress-score score-3">3.2/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('emergingTechnologyLondon')">
                     <div class="team-name">Emerging Technology</div>
                     <div class="stress-score score-2">2/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('globalPrivateMarketLondon')">
                     <div class="team-name">Global & Private Market</div>
                     <div class="stress-score score-4">4.2/5</div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="showChart('midBackOfficeLondon')">
                     <div class="team-name">Mid- & Back-Office</div>
                     <div class="stress-score score-3">2.8/5</div>
                 </div>
             </div>
             <div class="card" onclick="toggleVisibility('hongkong')">
                 <div class="office-name">Hong Kong Office</div>
-                <div class="stress-score score-5">4.5/5</div> <!-- Example aggregated score -->
+                <div class="stress-score score-5">4.5/5</div>
             </div>
             <div id="hongkong" class="hidden nested">
-                <div class="card">
+                <div class="card" onclick="showChart('globalPrivateMarketHK')">
                     <div class="team-name">Global & Private Market</div>
                     <div class="stress-score score-5">4.5/5</div>
                 </div>
             </div>
         </div>
+        <div id="chartContainer">
+            <canvas id="stressChart"></canvas>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        const historicalData = {
+            investmentManagement: [3, 4, 4.5, 4, 4.2],
+            investmentBanking: [2.5, 3, 3.5, 3.5, 3],
+            emergingTechnology: [2, 2.5, 3, 2.8, 3],
+            globalPrivateMarket: [4, 4.5, 4.7, 4.5, 4.6],
+            midBackOffice: [2, 2.5, 2.8, 2.6, 2.4],
+            investmentManagementLondon: [3, 3.5, 4, 3.8, 3.7],
+            investmentBankingLondon: [2, 2.5, 3, 3, 2.8],
+            emergingTechnologyLondon: [1.5, 2, 2.5, 2.2, 2],
+            globalPrivateMarketLondon: [3.5, 4, 4.5, 4.2, 4.3],
+            midBackOfficeLondon: [2, 2.5, 2.3, 2.5, 2.4],
+            globalPrivateMarketHK: [4, 4.5, 4.7, 4.8, 4.6]
+        };
+
         function toggleVisibility(id) {
             const element = document.getElementById(id);
             if (element.classList.contains('hidden')) {
@@ -139,6 +165,47 @@
             } else {
                 element.classList.add('hidden');
             }
+        }
+
+        function showChart(team) {
+            const data = historicalData[team];
+            const ctx = document.getElementById('stressChart').getContext('2d');
+            const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
+
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stress Levels',
+                        data: data,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Stress Level (1-5)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('chartContainer').style.display = 'block';
         }
     </script>
 </body>
