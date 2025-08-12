@@ -79,7 +79,7 @@
               width = +svg.attr("width"),
               height = +svg.attr("height");
 
-        const treeLayout = d3.tree().size([height - 100, width - 100]); // Adjust size for vertical layout
+        const treeLayout = d3.tree().size([height - 100, width - 100]); // Set layout to grow vertically
         const root = d3.hierarchy(data);
         treeLayout(root);
 
@@ -90,8 +90,8 @@
             .data(root.links())
             .enter().append("line")
             .attr("class", "link")
-            .attr("x1", d => d.source.y + 50) // Shift for center alignment
-            .attr("y1", d => d.source.x + 50)
+            .attr("x1", d => d.source.y + 50) // Use y for horizontal position
+            .attr("y1", d => d.source.x + 50) // Use x for vertical position
             .attr("x2", d => d.target.y + 50)
             .attr("y2", d => d.target.x + 50)
             .style("stroke", "#ccc");
@@ -103,7 +103,7 @@
             .data(root.descendants())
             .enter().append("g")
             .attr("class", "node")
-            .attr("transform", d => `translate(${d.y + 50},${d.x + 50})`); // Shift for center alignment
+            .attr("transform", d => `translate(${d.y + 50},${d.x + 50})`); // Correctly position nodes
 
         node.append("rect")
             .attr("width", 150)
