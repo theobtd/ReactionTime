@@ -79,7 +79,7 @@
               width = +svg.attr("width"),
               height = +svg.attr("height");
 
-        const treeLayout = d3.tree().size([width - 100, height - 100]); // Adjust size for vertical layout
+        const treeLayout = d3.tree().size([height - 100, width - 100]); // Adjust size for vertical layout
         const root = d3.hierarchy(data);
         treeLayout(root);
 
