@@ -56,8 +56,8 @@
         .nested {
             padding-left: 20px; /* Indent nested items */
         }
-        #chartContainer {
-            margin-top: 20px;
+        .chartContainer {
+            margin-top: 10px;
             display: none;
         }
         canvas {
@@ -79,25 +79,40 @@
                 <div class="stress-score score-4">4/5</div>
             </div>
             <div id="nyc" class="hidden nested">
-                <div class="card" onclick="showChart('investmentManagement')">
+                <div class="card" onclick="showChart('investmentManagement', this)">
                     <div class="team-name">Investment Management</div>
                     <div class="stress-score score-4">4/5</div>
                 </div>
-                <div class="card" onclick="showChart('investmentBanking')">
+                <div class="chartContainer">
+                    <canvas id="chart_investmentManagement"></canvas>
+                </div>
+                <div class="card" onclick="showChart('investmentBanking', this)">
                     <div class="team-name">Investment Banking</div>
                     <div class="stress-score score-3">3.5/5</div>
                 </div>
-                <div class="card" onclick="showChart('emergingTechnology')">
+                <div class="chartContainer">
+                    <canvas id="chart_investmentBanking"></canvas>
+                </div>
+                <div class="card" onclick="showChart('emergingTechnology', this)">
                     <div class="team-name">Emerging Technology</div>
                     <div class="stress-score score-3">3/5</div>
                 </div>
-                <div class="card" onclick="showChart('globalPrivateMarket')">
+                <div class="chartContainer">
+                    <canvas id="chart_emergingTechnology"></canvas>
+                </div>
+                <div class="card" onclick="showChart('globalPrivateMarket', this)">
                     <div class="team-name">Global & Private Market</div>
                     <div class="stress-score score-5">4.5/5</div>
                 </div>
-                <div class="card" onclick="showChart('midBackOffice')">
+                <div class="chartContainer">
+                    <canvas id="chart_globalPrivateMarket"></canvas>
+                </div>
+                <div class="card" onclick="showChart('midBackOffice', this)">
                     <div class="team-name">Mid- & Back-Office</div>
                     <div class="stress-score score-2">2.5/5</div>
+                </div>
+                <div class="chartContainer">
+                    <canvas id="chart_midBackOffice"></canvas>
                 </div>
             </div>
             <div class="card" onclick="toggleVisibility('london')">
@@ -105,25 +120,40 @@
                 <div class="stress-score score-4">3.8/5</div>
             </div>
             <div id="london" class="hidden nested">
-                <div class="card" onclick="showChart('investmentManagementLondon')">
+                <div class="card" onclick="showChart('investmentManagementLondon', this)">
                     <div class="team-name">Investment Management</div>
                     <div class="stress-score score-4">3.8/5</div>
                 </div>
-                <div class="card" onclick="showChart('investmentBankingLondon')">
+                <div class="chartContainer">
+                    <canvas id="chart_investmentManagementLondon"></canvas>
+                </div>
+                <div class="card" onclick="showChart('investmentBankingLondon', this)">
                     <div class="team-name">Investment Banking</div>
                     <div class="stress-score score-3">3.2/5</div>
                 </div>
-                <div class="card" onclick="showChart('emergingTechnologyLondon')">
+                <div class="chartContainer">
+                    <canvas id="chart_investmentBankingLondon"></canvas>
+                </div>
+                <div class="card" onclick="showChart('emergingTechnologyLondon', this)">
                     <div class="team-name">Emerging Technology</div>
                     <div class="stress-score score-2">2/5</div>
                 </div>
-                <div class="card" onclick="showChart('globalPrivateMarketLondon')">
+                <div class="chartContainer">
+                    <canvas id="chart_emergingTechnologyLondon"></canvas>
+                </div>
+                <div class="card" onclick="showChart('globalPrivateMarketLondon', this)">
                     <div class="team-name">Global & Private Market</div>
                     <div class="stress-score score-4">4.2/5</div>
                 </div>
-                <div class="card" onclick="showChart('midBackOfficeLondon')">
+                <div class="chartContainer">
+                    <canvas id="chart_globalPrivateMarketLondon"></canvas>
+                </div>
+                <div class="card" onclick="showChart('midBackOfficeLondon', this)">
                     <div class="team-name">Mid- & Back-Office</div>
                     <div class="stress-score score-3">2.8/5</div>
+                </div>
+                <div class="chartContainer">
+                    <canvas id="chart_midBackOfficeLondon"></canvas>
                 </div>
             </div>
             <div class="card" onclick="toggleVisibility('hongkong')">
@@ -131,14 +161,14 @@
                 <div class="stress-score score-5">4.5/5</div>
             </div>
             <div id="hongkong" class="hidden nested">
-                <div class="card" onclick="showChart('globalPrivateMarketHK')">
+                <div class="card" onclick="showChart('globalPrivateMarketHK', this)">
                     <div class="team-name">Global & Private Market</div>
                     <div class="stress-score score-5">4.5/5</div>
                 </div>
+                <div class="chartContainer">
+                    <canvas id="chart_globalPrivateMarketHK"></canvas>
+                </div>
             </div>
-        </div>
-        <div id="chartContainer">
-            <canvas id="stressChart"></canvas>
         </div>
     </div>
 
@@ -169,16 +199,24 @@
             }
         }
 
-        function showChart(team) {
+        function showChart(team, cardElement) {
             const data = historicalData[team];
-            const ctx = document.getElementById('stressChart').getContext('2d');
+            const chartId = 'chart_' + team; // Unique canvas ID
+            const ctx = document.getElementById(chartId).getContext('2d');
             const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
+
+            // Hide any existing chart containers
+            const allChartContainers = document.querySelectorAll('.chartContainer');
+            allChartContainers.forEach(container => {
+                container.style.display = 'none';
+            });
 
             // Destroy existing chart instance if it exists
             if (chartInstance) {
                 chartInstance.destroy();
             }
 
+            // Create the chart
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -197,8 +235,8 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            min: 0,  // Set minimum value
-                            max: 5,  // Set maximum value
+                            min: 0, // Set minimum value
+                            max: 5, // Set maximum value
                             title: {
                                 display: true,
                                 text: 'Stress Level (0-5)'
@@ -214,7 +252,9 @@
                 }
             });
 
-            document.getElementById('chartContainer').style.display = 'block';
+            // Show the specific chart container
+            const chartContainer = cardElement.nextElementSibling;
+            chartContainer.style.display = 'block';
         }
     </script>
 </body>
