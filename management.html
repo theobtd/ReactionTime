@@ -23,6 +23,7 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .card {
             background-color: #f0f0f0;
@@ -31,7 +32,9 @@
             margin: 10px 0;
             cursor: pointer;
             transition: background-color 0.3s;
-            position: relative; /* For line positioning */
+            position: relative;
+            display: inline-block;
+            width: 200px;
         }
         .card:hover {
             background-color: #e0e0e0;
@@ -55,36 +58,28 @@
             display: none;
         }
         .nested {
-            padding-left: 20px; /* Indent nested items */
-            position: relative; /* For line positioning */
+            display: none; /* Hide nested items initially */
+            margin-left: 20px; /* Indent nested items */
         }
-        .line {
-            position: absolute;
-            left: -20px; /* Adjust left position for line */
-            top: 20px; /* Adjust top position for line */
-            height: 20px; /* Adjust height for line */
-            width: 2px; /* Line thickness */
-            background-color: #ccc; /* Line color */
+        .visible {
+            display: block; /* Show nested items when expanded */
         }
-        .line:before {
-            content: '';
+        .tree-line {
             position: absolute;
-            left: -15px;
-            top: 0;
-            height: 100%;
-            width: 2px;
+            top: 50%;
+            left: 100%;
+            width: 20px;
+            height: 2px;
             background-color: #ccc;
         }
-        .line:after {
+        .tree-line:before {
             content: '';
             position: absolute;
-            left: -15px;
-            top: 0;
-            height: 20px; /* Adjust height for line */
-            width: 10px; /* Adjust width for line end */
-            border-top: 2px solid #ccc;
-            transform: rotate(45deg);
-            top: 20px; /* Position for the line end */
+            top: -50%;
+            left: 0;
+            width: 2px;
+            height: 50%;
+            background-color: #ccc;
         }
     </style>
 </head>
@@ -94,15 +89,15 @@
         <div class="card" onclick="toggleVisibility('company')">
             <div class="team-name">Company</div>
             <div class="stress-score score-4">4/5</div>
-            <div class="line"></div>
+            <div class="tree-line"></div>
         </div>
-        <div id="company" class="hidden nested">
+        <div id="company" class="nested">
             <div class="card" onclick="toggleVisibility('nyc')">
                 <div class="office-name">New York City Office</div>
                 <div class="stress-score score-4">4/5</div>
-                <div class="line"></div>
+                <div class="tree-line"></div>
             </div>
-            <div id="nyc" class="hidden nested">
+            <div id="nyc" class="nested">
                 <div class="card">
                     <div class="team-name">Investment Management</div>
                     <div class="stress-score score-4">4/5</div>
@@ -127,9 +122,9 @@
             <div class="card" onclick="toggleVisibility('london')">
                 <div class="office-name">London Office</div>
                 <div class="stress-score score-4">3.8/5</div>
-                <div class="line"></div>
+                <div class="tree-line"></div>
             </div>
-            <div id="london" class="hidden nested">
+            <div id="london" class="nested">
                 <div class="card">
                     <div class="team-name">Investment Management</div>
                     <div class="stress-score score-4">3.8/5</div>
@@ -154,9 +149,8 @@
             <div class="card" onclick="toggleVisibility('hongkong')">
                 <div class="office-name">Hong Kong Office</div>
                 <div class="stress-score score-5">4.5/5</div>
-                <div class="line"></div>
             </div>
-            <div id="hongkong" class="hidden nested">
+            <div id="hongkong" class="nested">
                 <div class="card">
                     <div class="team-name">Global & Private Market</div>
                     <div class="stress-score score-5">4.5/5</div>
@@ -170,7 +164,9 @@
             const element = document.getElementById(id);
             if (element.classList.contains('hidden')) {
                 element.classList.remove('hidden');
+                element.classList.add('visible');
             } else {
+                element.classList.remove('visible');
                 element.classList.add('hidden');
             }
         }
