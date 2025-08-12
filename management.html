@@ -158,6 +158,8 @@
             globalPrivateMarketHK: [4, 4.5, 4.7, 4.8, 4.6]
         };
 
+        let chartInstance = null;
+
         function toggleVisibility(id) {
             const element = document.getElementById(id);
             if (element.classList.contains('hidden')) {
@@ -172,7 +174,12 @@
             const ctx = document.getElementById('stressChart').getContext('2d');
             const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
 
-            const chart = new Chart(ctx, {
+            // Destroy existing chart instance if it exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
