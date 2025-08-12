@@ -3,86 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Company Structure Tree</title>
+    <title>Management Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #fbebdc;
+            color: #333;
             margin: 0;
-            height: 100vh;
-            justify-content: center;
+            padding: 20px;
         }
-        .layer {
+        h1 {
+            text-align: center;
+            color: #f4634c;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .dendrogram {
+            list-style-type: none;
+            padding: 0;
+        }
+        .dendrogram > li {
+            margin: 15px 0;
+        }
+        .office-name {
+            font-weight: bold;
+            font-size: 24px;
+            color: #f4634c;
+        }
+        .team {
+            margin-left: 20px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 10px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            position: relative;
-            height: 10%;
-            width: 100%;
         }
-        .line {
-            width: 2px;
-            background-color: black;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+        .team-name {
+            font-weight: bold;
         }
-        .item {
-            margin: 0 20px;
-            position: relative;
+        .stress-score {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
         }
-        .item:not(:last-child) .line {
-            height: 100%;
-        }
-        .item:not(:last-child)::after {
-            content: '';
-            width: 2px;
-            height: 100%;
-            background: black;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .sub-layer {
-            margin-top: 10%;
-        }
+        .score-1 { background-color: #f44336; } /* Red */
+        .score-2 { background-color: #ff9800; } /* Orange */
+        .score-3 { background-color: #ffeb3b; color: black; } /* Yellow */
+        .score-4 { background-color: #4caf50; } /* Green */
+        .score-5 { background-color: #388e3c; } /* Dark Green */
     </style>
 </head>
 <body>
-    <div class="layer">
-        <div class="item">Company</div>
-    </div>
-    <div class="layer sub-layer">
-        <div class="item">
-            New York
-            <div class="line"></div>
-            <div class="sub-layer">
-                <div class="item">Investment Banking</div>
-                <div class="item">Global Markets</div>
-                <div class="item">Mid- and back-office</div>
-            </div>
-        </div>
-        <div class="item">
-            London
-            <div class="line"></div>
-            <div class="sub-layer">
-                <div class="item">Investment Banking</div>
-                <div class="item">Global Markets</div>
-                <div class="item">Mid- and back-office</div>
-            </div>
-        </div>
-        <div class="item">
-            Hong Kong
-            <div class="line"></div>
-            <div class="sub-layer">
-                <div class="item">Investment Banking</div>
-            </div>
-        </div>
+    <h1>Team Stress Levels</h1>
+    <div class="container">
+        <ul class="dendrogram">
+            <li>Company
+                <ul>
+                    <li class="office-name">New York City Office
+                        <ul>
+                            <li class="team">
+                                <div class="team-name">Investment Management</div>
+                                <div class="stress-score score-4">4/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Investment Banking</div>
+                                <div class="stress-score score-3">3.5/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Emerging Technology</div>
+                                <div class="stress-score score-3">3/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Global & Private Market</div>
+                                <div class="stress-score score-5">4.5/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Mid- & Back-Office</div>
+                                <div class="stress-score score-2">2.5/5</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="office-name">London Office
+                        <ul>
+                            <li class="team">
+                                <div class="team-name">Investment Management</div>
+                                <div class="stress-score score-4">3.8/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Investment Banking</div>
+                                <div class="stress-score score-3">3.2/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Emerging Technology</div>
+                                <div class="stress-score score-2">2/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Global & Private Market</div>
+                                <div class="stress-score score-4">4.2/5</div>
+                            </li>
+                            <li class="team">
+                                <div class="team-name">Mid- & Back-Office</div>
+                                <div class="stress-score score-3">2.8/5</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="office-name">Hong Kong Office
+                        <ul>
+                            <li class="team">
+                                <div class="team-name">Global & Private Market</div>
+                                <div class="stress-score score-5">4.5/5</div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
     </div>
 </body>
 </html>
