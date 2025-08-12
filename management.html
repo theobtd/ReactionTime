@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management Page</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,34 +17,15 @@
             text-align: center;
             color: #f4634c;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        .card {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
+        .node {
             cursor: pointer;
-            transition: background-color 0.3s;
-            position: relative;
-            display: inline-block;
-            width: 200px;
-        }
-        .card:hover {
-            background-color: #e0e0e0;
+            text-align: center;
         }
         .team-name, .office-name {
             font-weight: bold;
         }
         .stress-score {
-            font-size: 20px;
+            font-size: 14px;
             font-weight: bold;
             padding: 5px 10px;
             border-radius: 5px;
@@ -54,123 +36,94 @@
         .score-3 { background-color: #ffeb3b; color: black; } /* Yellow */
         .score-4 { background-color: #4caf50; } /* Green */
         .score-5 { background-color: #388e3c; } /* Dark Green */
-        .hidden {
-            display: none;
-        }
-        .nested {
-            display: none; /* Hide nested items initially */
-            margin-left: 20px; /* Indent nested items */
-        }
-        .visible {
-            display: block; /* Show nested items when expanded */
-        }
-        .tree-line {
-            position: absolute;
-            top: 50%;
-            left: 100%;
-            width: 20px;
-            height: 2px;
-            background-color: #ccc;
-        }
-        .tree-line:before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: 0;
-            width: 2px;
-            height: 50%;
-            background-color: #ccc;
-        }
-        .offices-container {
-            display: flex;
-            flex-direction: column;
-        }
     </style>
 </head>
 <body>
     <h1>Team Stress Levels</h1>
-    <div class="container">
-        <div class="offices-container">
-            <div class="card" onclick="toggleVisibility('company')">
-                <div class="team-name">Company</div>
-                <div class="stress-score score-4">4/5</div>
-                <div class="tree-line"></div>
-            </div>
-            <div id="company" class="nested">
-                <div class="card" onclick="toggleVisibility('nyc')">
-                    <div class="office-name">New York City Office</div>
-                    <div class="stress-score score-4">4/5</div>
-                    <div class="tree-line"></div>
-                </div>
-                <div id="nyc" class="nested">
-                    <div class="card">
-                        <div class="team-name">Investment Management</div>
-                        <div class="stress-score score-4">4/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Investment Banking</div>
-                        <div class="stress-score score-3">3.5/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Emerging Technology</div>
-                        <div class="stress-score score-3">3/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Global & Private Market</div>
-                        <div class="stress-score score-5">4.5/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Mid- & Back-Office</div>
-                        <div class="stress-score score-2">2.5/5</div>
-                    </div>
-                </div>
-                <div class="card" onclick="toggleVisibility('london')">
-                    <div class="office-name">London Office</div>
-                    <div class="stress-score score-4">3.8/5</div>
-                    <div class="tree-line"></div>
-                </div>
-                <div id="london" class="nested">
-                    <div class="card">
-                        <div class="team-name">Investment Management</div>
-                        <div class="stress-score score-4">3.8/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Investment Banking</div>
-                        <div class="stress-score score-3">3.2/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Emerging Technology</div>
-                        <div class="stress-score score-2">2/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Global & Private Market</div>
-                        <div class="stress-score score-4">4.2/5</div>
-                    </div>
-                    <div class="card">
-                        <div class="team-name">Mid- & Back-Office</div>
-                        <div class="stress-score score-3">2.8/5</div>
-                    </div>
-                </div>
-                <div class="card" onclick="toggleVisibility('hongkong')">
-                    <div class="office-name">Hong Kong Office</div>
-                    <div class="stress-score score-5">4.5/5</div>
-                </div>
-                <div id="hongkong" class="nested">
-                    <div class="card">
-                        <div class="team-name">Global & Private Market</div>
-                        <div class="stress-score score-5">4.5/5</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <svg width="800" height="600"></svg>
 
     <script>
-        function toggleVisibility(id) {
-            const element = document.getElementById(id);
-            element.classList.toggle('hidden'); // Toggle class directly
-            element.classList.toggle('visible'); // Toggle visibility class
-        }
+        const data = {
+            name: "Company",
+            children: [
+                {
+                    name: "New York City Office",
+                    children: [
+                        { name: "Investment Management", score: "4/5", class: "score-4" },
+                        { name: "Investment Banking", score: "3.5/5", class: "score-3" },
+                        { name: "Emerging Technology", score: "3/5", class: "score-3" },
+                        { name: "Global & Private Market", score: "4.5/5", class: "score-5" },
+                        { name: "Mid- & Back-Office", score: "2.5/5", class: "score-2" }
+                    ]
+                },
+                {
+                    name: "London Office",
+                    children: [
+                        { name: "Investment Management", score: "3.8/5", class: "score-4" },
+                        { name: "Investment Banking", score: "3.2/5", class: "score-3" },
+                        { name: "Emerging Technology", score: "2/5", class: "score-2" },
+                        { name: "Global & Private Market", score: "4.2/5", class: "score-4" },
+                        { name: "Mid- & Back-Office", score: "2.8/5", class: "score-3" }
+                    ]
+                },
+                {
+                    name: "Hong Kong Office",
+                    children: [
+                        { name: "Global & Private Market", score: "4.5/5", class: "score-5" }
+                    ]
+                }
+            ]
+        };
+
+        const svg = d3.select("svg"),
+              width = +svg.attr("width"),
+              height = +svg.attr("height");
+
+        const treeLayout = d3.tree().size([height - 100, width - 100]);
+        const root = d3.hierarchy(data);
+        treeLayout(root);
+
+        // Links
+        svg.append("g")
+            .attr("transform", "translate(50,50)")
+            .selectAll(".link")
+            .data(root.links())
+            .enter().append("line")
+            .attr("class", "link")
+            .attr("x1", d => d.source.y)
+            .attr("y1", d => d.source.x)
+            .attr("x2", d => d.target.y)
+            .attr("y2", d => d.target.x)
+            .style("stroke", "#ccc");
+
+        // Nodes
+        const node = svg.append("g")
+            .attr("transform", "translate(50,50)")
+            .selectAll(".node")
+            .data(root.descendants())
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.y},${d.x})`);
+
+        node.append("rect")
+            .attr("width", 150)
+            .attr("height", 30)
+            .attr("rx", 5)
+            .attr("class", d => d.data.class)
+            .attr("fill", "#f0f0f0")
+            .attr("stroke", "#ccc");
+
+        node.append("text")
+            .attr("dy", "1.5em")
+            .attr("x", 75)
+            .attr("text-anchor", "middle")
+            .text(d => d.data.name);
+
+        node.append("text")
+            .attr("dy", "3em")
+            .attr("x", 75)
+            .attr("text-anchor", "middle")
+            .text(d => d.data.score);
     </script>
 </body>
 </html>
