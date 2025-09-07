@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-database-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&display=swap');
         body {
@@ -1067,10 +1068,16 @@
                 <p>Your assessment has been completed successfully.</p>
                 <p><strong>Cumulative Response Time:</strong> ${cumulativeResponseTime} ms</p>
                 <p><strong>Total Errors:</strong> ${totalErrors}</p>
+                <canvas id="responseTimeChart" style="max-width: 600px; margin: auto;"></canvas>
             `;
         
+            // Fetch historical data based on Participant ID
+            if (participantInfo.participantId) {
+                fetchHistoricalData(participantInfo.participantId);
+            }
+        
             document.getElementById("restartButton").style.display = "block";
-            
+        
             // Optionally, include email subscription section as before
             document.getElementById("result").innerHTML += `
                 <div id="emailSubscriptionSection" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
@@ -1086,7 +1093,63 @@
         
             // Add the event listener for the subscribe button
             document.getElementById("subscribeButton").addEventListener("click", subscribeToReminders);
-            document.getElementById("progressBar").style.width = "100%";
+        }
+
+        function fetchHistoricalData(participantId) {
+            firebaseDb.ref('tests').orderByChild('participantId').equalTo(participantId).once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const cumulativeTimes = [];
+                    const timestamps = [];
+        
+                    for (const key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            cumulativeTimes.push(data[key].cumulativeResponseTime);
+                            timestamps.push(new Date(data[key].timestamp).toLocaleDateString());
+                        }
+                    }
+        
+                    createGraph(cumulativeTimes, timestamps);
+                } else {
+                    console.log("No data found for this Participant ID.");
+                }
+            });
+        }
+
+        function createGraph(cumulativeTimes, timestamps) {
+            const ctx = document.getElementById('responseTimeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [{
+                        label: 'Cumulative Response Time (ms)',
+                        data: cumulativeTimes,
+                        borderColor: '#f4634c',
+                        backgroundColor: 'rgba(244, 99, 76, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Response Time (ms)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Test Date'
+                            }
+                        }
+                    }
+                }
+            });
         }
         
         function updateProgressBar() {
