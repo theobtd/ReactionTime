@@ -1060,13 +1060,17 @@
                 .reduce((acc, time) => acc + time, 0);
             const totalErrors = wrongGuesses.normal + wrongGuesses.reversed;
         
-            // Display the results with cumulative response time and errors
+            // Calculate Mental Index
+            const mentalIndex = cumulativeResponseTime * (1 + totalErrors);
+        
+            // Display the results with cumulative response time, total errors, and mental index
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
                 <p><strong>Thank You</strong></p>
                 <p>Your assessment has been completed successfully.</p>
                 <p><strong>Cumulative Response Time:</strong> ${cumulativeResponseTime} ms</p>
                 <p><strong>Total Errors:</strong> ${totalErrors}</p>
+                <p><strong>Mental Index:</strong> ${mentalIndex}</p>
             `;
         
             document.getElementById("restartButton").style.display = "block";
