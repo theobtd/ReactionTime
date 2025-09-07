@@ -214,7 +214,11 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             max-width: 500px;
             width: 90%;
-            margin: 0;
+            margin: 0 auto; /* Keep this for horizontal centering */
+            position: absolute; /* Change to absolute positioning */
+            top: 10px; /* Set top to 10px */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Adjust horizontal centering */
         }
         .input-field {
             width: 100%;
