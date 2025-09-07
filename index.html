@@ -1054,6 +1054,46 @@
                 document.getElementById("touchButtonsContainer").style.display = "none";
             }
             toggleProgressBar(false);
+
+            const resultData = {
+                participantInfo: participantInfo,
+                testResults: {
+                    normalFlanker: {
+                        congruent: Math.round(averageNormalCongruent),
+                        incongruent: Math.round(averageNormalIncongruent),
+                        wrongGuesses: wrongGuesses.normal,
+                        rawTimes: {
+                            congruent: reactionTimes.normal.congruent,
+                            incongruent: reactionTimes.normal.incongruent
+                        }
+                    },
+                    reversedFlanker: {
+                        congruent: Math.round(averageReversedCongruent),
+                        incongruent: Math.round(averageReversedIncongruent),
+                        wrongGuesses: wrongGuesses.reversed,
+                        rawTimes: {
+                            congruent: reactionTimes.reversed.congruent,
+                            incongruent: reactionTimes.reversed.incongruent
+                        }
+                    },
+                    alertingTest: {
+                        averageReactionTime: Math.round(averageAlertingReactionTime),
+                        spacebarPressCount: spacebarPressCount,
+                        rawTimes: alertingReactionTimes
+                    },
+                    deviceType: isTouchDevice ? 'Touchscreen' : 'Physical Keyboard',
+                    completedAt: new Date().toISOString()
+                }
+            };
+            
+            // Save complete data to Firebase
+            firebaseDb.ref('attentionNetworkTest/' + sessionId).set(resultData)
+                .then(() => {
+                    console.log("Data saved successfully");
+                })
+                .catch((error) => {
+                    console.error("Error saving data: ", error);
+                });
         
             // Calculate cumulative response times and total errors
             const cumulativeResponseTime = reactionTimes.normal.congruent.concat(reactionTimes.normal.incongruent, reactionTimes.reversed.congruent, reactionTimes.reversed.incongruent)
