@@ -1077,6 +1077,9 @@
                 reactionTimes.reversed.congruent, reactionTimes.reversed.incongruent)
                 .reduce((acc, time) => acc + time, 0);
         
+            // Calculate total errors
+            const totalErrors = wrongGuesses.normal + wrongGuesses.reversed;
+        
             const resultData = {
                 participantInfo: participantInfo,
                 testResults: {
