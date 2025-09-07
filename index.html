@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-database-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&display=swap');
         body {
@@ -1054,7 +1055,7 @@
                 document.getElementById("touchButtonsContainer").style.display = "none";
             }
             toggleProgressBar(false);
-
+        
             let averageNormalCongruent = reactionTimes.normal.congruent.length > 0 
                 ? reactionTimes.normal.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.congruent.length 
                 : 0;
@@ -1070,7 +1071,7 @@
             let averageAlertingReactionTime = alertingReactionTimes.length > 0
                 ? alertingReactionTimes.reduce((acc, time) => acc + time, 0) / alertingReactionTimes.length
                 : 0;
-
+        
             const resultData = {
                 participantInfo: participantInfo,
                 testResults: {
@@ -1106,17 +1107,16 @@
             firebaseDb.ref('attentionNetworkTest/' + sessionId).set(resultData)
                 .then(() => {
                     console.log("Data saved successfully");
+                    // Fetch cumulative response times if participant ID is provided
+                    if (participantInfo.participantId) {
+                        fetchCumulativeResponseTimes(participantInfo.participantId);
+                    }
                 })
                 .catch((error) => {
                     console.error("Error saving data: ", error);
                 });
         
-            // Calculate cumulative response times and total errors
-            const cumulativeResponseTime = reactionTimes.normal.congruent.concat(reactionTimes.normal.incongruent, reactionTimes.reversed.congruent, reactionTimes.reversed.incongruent)
-                .reduce((acc, time) => acc + time, 0);
-            const totalErrors = wrongGuesses.normal + wrongGuesses.reversed;
-        
-            // Display the results with cumulative response time and errors
+            // Display existing results
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
                 <p><strong>Thank You</strong></p>
@@ -1125,9 +1125,7 @@
                 <p><strong>Total Errors:</strong> ${totalErrors}</p>
             `;
         
-            document.getElementById("restartButton").style.display = "block";
-            
-            // Optionally, include email subscription section as before
+            // Email subscription section (as before)
             document.getElementById("result").innerHTML += `
                 <div id="emailSubscriptionSection" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
                     <p><strong>Stay on Track with Your Cognitive Health</strong></p>
@@ -1143,6 +1141,70 @@
             // Add the event listener for the subscribe button
             document.getElementById("subscribeButton").addEventListener("click", subscribeToReminders);
             document.getElementById("progressBar").style.width = "100%";
+        }
+        
+        // New function to fetch cumulative response times
+        function fetchCumulativeResponseTimes(participantId) {
+            firebaseDb.ref('attentionNetworkTest').orderByChild('participantInfo/participantId').equalTo(participantId).once('value')
+                .then(snapshot => {
+                    const responseTimes = [];
+                    snapshot.forEach(childSnapshot => {
+                        const data = childSnapshot.val();
+                        const cumulativeTime = data.testResults.normalFlanker.rawTimes.congruent.concat(data.testResults.normalFlanker.rawTimes.incongruent, 
+                            data.testResults.reversedFlanker.rawTimes.congruent, data.testResults.reversedFlanker.rawTimes.incongruent)
+                            .reduce((acc, time) => acc + time, 0);
+                        responseTimes.push({ time: cumulativeTime, date: new Date(data.testResults.completedAt) });
+                    });
+        
+                    // Sort by date
+                    responseTimes.sort((a, b) => a.date - b.date);
+                    displayResponseTimeGraph(responseTimes);
+                })
+                .catch(error => {
+                    console.error("Error fetching cumulative response times: ", error);
+                });
+        }
+        
+        // Function to display the response time graph
+        function displayResponseTimeGraph(data) {
+            const ctx = document.createElement('canvas');
+            ctx.id = "responseTimeChart";
+            document.getElementById("result").appendChild(ctx);
+        
+            const labels = data.map(entry => entry.date.toLocaleDateString());
+            const times = data.map(entry => entry.time);
+        
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cumulative Response Times (ms)',
+                        data: times,
+                        borderColor: '#f4634c',
+                        backgroundColor: 'rgba(244, 99, 76, 0.2)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Response Time (ms)'
+                            }
+                        }
+                    }
+                }
+            });
         }
         
         function updateProgressBar() {
