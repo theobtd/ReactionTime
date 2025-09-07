@@ -123,7 +123,7 @@
         }
         .instruction-screen {
             background-color: white;
-            padding: 10px;
+            padding: 40px;
             border-radius: 4px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             max-width: 500px;
@@ -1060,17 +1060,13 @@
                 .reduce((acc, time) => acc + time, 0);
             const totalErrors = wrongGuesses.normal + wrongGuesses.reversed;
         
-            // Calculate Mental Index
-            const mentalIndex = cumulativeResponseTime * (1 + totalErrors);
-        
-            // Display the results with cumulative response time, total errors, and mental index
+            // Display the results with cumulative response time and errors
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
                 <p><strong>Thank You</strong></p>
                 <p>Your assessment has been completed successfully.</p>
                 <p><strong>Cumulative Response Time:</strong> ${cumulativeResponseTime} ms</p>
                 <p><strong>Total Errors:</strong> ${totalErrors}</p>
-                <p><strong>Mental Index:</strong> ${mentalIndex}</p>
             `;
         
             document.getElementById("restartButton").style.display = "block";
