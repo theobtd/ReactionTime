@@ -42,6 +42,7 @@
             border: none;
             font-size: 16px;
             transition: all 0.3s ease;
+            margin: 10px 0; /* Add margin for spacing */
         }
         button:hover {
             background-color: #fba899;
@@ -56,6 +57,7 @@
     <h1>Create Participant ID</h1>
     <input type="text" id="participantIdInput" class="input-field" placeholder="Enter your Participant ID">
     <button id="submitButton">Submit</button>
+    <button id="backButton">Back to Index</button> <!-- New button for redirection -->
     <p id="message"></p>
 
     <script>
@@ -95,7 +97,6 @@
                         .then(() => {
                             messageElement.textContent = "Participant ID created successfully!";
                             document.getElementById("participantIdInput").value = ''; // Clear input
-                            window.location.href = "index.html";
                         })
                         .catch((error) => {
                             console.error("Error saving Participant ID: ", error);
@@ -106,6 +107,11 @@
                 console.error("Error fetching Participant IDs: ", error);
                 messageElement.textContent = "Error checking Participant IDs. Please try again.";
             });
+        });
+
+        // Event listener for the back button
+        document.getElementById("backButton").addEventListener("click", function() {
+            window.location.href = "index.html"; // Redirect to index.html
         });
     </script>
 </body>
