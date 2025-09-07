@@ -95,6 +95,7 @@
                         .then(() => {
                             messageElement.textContent = "Participant ID created successfully!";
                             document.getElementById("participantIdInput").value = ''; // Clear input
+                            window.location.href = "index.html";
                         })
                         .catch((error) => {
                             console.error("Error saving Participant ID: ", error);
