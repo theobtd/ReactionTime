@@ -1054,156 +1054,24 @@
                 document.getElementById("touchButtonsContainer").style.display = "none";
             }
             toggleProgressBar(false);
-            let averageNormalCongruent = reactionTimes.normal.congruent.length > 0 
-                ? reactionTimes.normal.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.congruent.length 
-                : 0;
-            let averageNormalIncongruent = reactionTimes.normal.incongruent.length > 0
-                ? reactionTimes.normal.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.incongruent.length
-                : 0;
-            let averageReversedCongruent = reactionTimes.reversed.congruent.length > 0
-                ? reactionTimes.reversed.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.congruent.length
-                : 0;
-            let averageReversedIncongruent = reactionTimes.reversed.incongruent.length > 0
-                ? reactionTimes.reversed.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.incongruent.length
-                : 0;
-            let averageAlertingReactionTime = alertingReactionTimes.length > 0
-                ? alertingReactionTimes.reduce((acc, time) => acc + time, 0) / alertingReactionTimes.length
-                : 0;
-            
-            const resultData = {
-                participantInfo: participantInfo,
-                testResults: {
-                    normalFlanker: {
-                        congruent: Math.round(averageNormalCongruent),
-                        incongruent: Math.round(averageNormalIncongruent),
-                        wrongGuesses: wrongGuesses.normal,
-                        rawTimes: {
-                            congruent: reactionTimes.normal.congruent,
-                            incongruent: reactionTimes.normal.incongruent
-                        }
-                    },
-                    reversedFlanker: {
-                        congruent: Math.round(averageReversedCongruent),
-                        incongruent: Math.round(averageReversedIncongruent),
-                        wrongGuesses: wrongGuesses.reversed,
-                        rawTimes: {
-                            congruent: reactionTimes.reversed.congruent,
-                            incongruent: reactionTimes.reversed.incongruent
-                        }
-                    },
-                    alertingTest: {
-                        averageReactionTime: Math.round(averageAlertingReactionTime),
-                        spacebarPressCount: spacebarPressCount,
-                        rawTimes: alertingReactionTimes
-                    },
-                    deviceType: isTouchDevice ? 'Touchscreen' : 'Physical Keyboard',
-                    completedAt: new Date().toISOString()
-                }
-            };
-            
-            // Assess risk level based on results
-            const riskAssessment = assessRiskLevel(resultData.testResults);
-            
-            // Add risk assessment to the result data
-            resultData.testResults.riskAssessment = {
-                level: riskAssessment.level,
-                indicators: riskAssessment.indicators
-            };
-            
-            // Save complete data to Firebase
-            firebaseDb.ref('attentionNetworkTest/' + sessionId).set(resultData)
-                .then(() => {
-                    console.log("Data saved successfully");
-                })
-                .catch((error) => {
-                    console.error("Error saving data: ", error);
-                });
-            
-            // Create recommendations HTML
-            let recommendationsHTML = '';
-            riskAssessment.recommendations.forEach(rec => {
-                recommendationsHTML += `<li>${rec}</li>`;
-            });
-            
-          
-            // Display the results with the risk assessment
+        
+            // Calculate cumulative response times and total errors
+            const cumulativeResponseTime = reactionTimes.normal.congruent.concat(reactionTimes.normal.incongruent, reactionTimes.reversed.congruent, reactionTimes.reversed.incongruent)
+                .reduce((acc, time) => acc + time, 0);
+            const totalErrors = wrongGuesses.normal + wrongGuesses.reversed;
+        
+            // Display the results with cumulative response time and errors
             document.getElementById("result").style.display = "block";
             document.getElementById("result").innerHTML = `
-                <style>
-                    .risk-continuum {
-                        width: 100%;
-                        height: 40px;
-                        background: linear-gradient(to right, #4CAF50, #FF9800, #F44336);
-                        border-radius: 20px;
-                        position: relative;
-                        margin: 25px 0;
-                    }
-                    .risk-pointer {
-                        position: absolute;
-                        width: 0;
-                        height: 0;
-                        border-left: 10px solid transparent;
-                        border-right: 10px solid transparent;
-                        border-bottom: 15px solid #333;
-                        bottom: 100%;
-                        transform: translateX(-50%);
-                    }
-                    .risk-labels {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-top: 5px;
-                        font-weight: 500;
-                    }
-                    .risk-label {
-                        text-align: center;
-                        width: 33.33%;
-                    }
-                    .risk-level-text {
-                        font-size: 24px;
-                        font-weight: 500;
-                        color: ${riskAssessment.color};
-                        margin-bottom: 10px;
-                    }
-                    .recommendations {
-                        text-align: left;
-                        margin-top: 25px;
-                    }
-                    .recommendations ul {
-                        padding-left: 20px;
-                    }
-                    .recommendations li {
-                        margin-bottom: 10px;
-                        line-height: 1.4;
-                    }
-                </style>
                 <p><strong>Thank You</strong></p>
                 <p>Your assessment has been completed successfully.</p>
-
-                <div class="risk-level-text">${riskAssessment.level}</div>
-
-                <div class="risk-continuum">
-                    <div class="risk-pointer" style="left: ${
-                        riskAssessment.level === "Low Risk" ? "16.67%" : 
-                        riskAssessment.level === "Medium Risk" ? "50%" : "83.33%"
-                    };"></div>
-                </div>
-                <div class="risk-labels">
-                    <div class="risk-label">Low Risk</div>
-                    <div class="risk-label">Medium Risk</div>
-                    <div class="risk-label">High Risk</div>
-                </div>
-
-                <div class="recommendations">
-                    <p><strong>Recommendations:</strong></p>
-                    <ul>
-                        ${recommendationsHTML}
-                    </ul>
-                </div>
+                <p><strong>Cumulative Response Time:</strong> ${cumulativeResponseTime} ms</p>
+                <p><strong>Total Errors:</strong> ${totalErrors}</p>
             `;
-          
-            
+        
             document.getElementById("restartButton").style.display = "block";
-            // Add the email subscription form to the results section
+            
+            // Optionally, include email subscription section as before
             document.getElementById("result").innerHTML += `
                 <div id="emailSubscriptionSection" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
                     <p><strong>Stay on Track with Your Cognitive Health</strong></p>
@@ -1215,7 +1083,7 @@
                     <p id="subscriptionMessage" style="font-size: 14px; margin-top: 10px; display: none;"></p>
                 </div>
             `;
-
+        
             // Add the event listener for the subscribe button
             document.getElementById("subscribeButton").addEventListener("click", subscribeToReminders);
             document.getElementById("progressBar").style.width = "100%";
