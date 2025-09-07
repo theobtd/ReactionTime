@@ -679,28 +679,58 @@
             let age = document.getElementById("participantAge").value.trim();
             let gender = document.getElementById("participantGender").value;
             let disclaimerAccepted = document.getElementById("disclaimerCheckbox").checked;
-
+        
             if (!age || !gender) {
                 alert("Please fill in age and gender fields.");
                 return;
             }
-
+        
             if (!disclaimerAccepted) {
                 alert("Please read and agree to the disclaimer before continuing.");
                 return;
             }
-
-            participantInfo = {
-                participantId: participantId,
-                age: age,
-                gender: gender,
-                disclaimerAccepted: true,
-                timestamp: new Date().toISOString()
-            };
-
-            sessionId = generateUniqueId();
-            document.getElementById("participantInfoScreen").style.display = "none";
-            document.getElementById("deviceSelectionScreen").style.display = "block";
+        
+            // Proceed if the participant ID is empty
+            if (!participantId) {
+                participantInfo = {
+                    participantId: null, // Set to null if no ID is provided
+                    age: age,
+                    gender: gender,
+                    disclaimerAccepted: true,
+                    timestamp: new Date().toISOString()
+                };
+                sessionId = generateUniqueId();
+                document.getElementById("participantInfoScreen").style.display = "none";
+                document.getElementById("deviceSelectionScreen").style.display = "block";
+                return;
+            }
+        
+            // Check if the participant ID exists in the database
+            firebaseDb.ref('participantIDs').once('value').then(snapshot => {
+                const existingIDs = snapshot.val() || {};
+        
+                if (!existingIDs[participantId]) {
+                    alert("This Participant ID does not exist. Please enter a valid Participant ID.");
+                    return;
+                }
+        
+                // If it exists, set participant info and proceed
+                participantInfo = {
+                    participantId: participantId,
+                    age: age,
+                    gender: gender,
+                    disclaimerAccepted: true,
+                    timestamp: new Date().toISOString()
+                };
+        
+                sessionId = generateUniqueId();
+                document.getElementById("participantInfoScreen").style.display = "none";
+                document.getElementById("deviceSelectionScreen").style.display = "block";
+        
+            }).catch(error => {
+                console.error("Error checking Participant ID: ", error);
+                alert("Error checking Participant ID. Please try again.");
+            });
         }
       
         function addActiveClass(button) {
