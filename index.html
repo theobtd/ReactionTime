@@ -1115,10 +1115,12 @@
             firebaseDb.ref('attentionNetworkTest/' + sessionId).set(resultData)
                 .then(() => {
                     console.log("Data saved successfully");
-                    // Fetch cumulative response times if participant ID is provided
+                    // Fetch wrong answers and cumulative response times if participant ID is provided
                     if (participantInfo.participantId) {
-                        fetchCumulativeResponseTimes(participantInfo.participantId);
                         fetchWrongAnswers(participantInfo.participantId);
+                        fetchCumulativeResponseTimes(participantInfo.participantId);
+                    } else {
+                        displayEmptyGraph(); // New function to display outline graph
                     }
                 })
                 .catch((error) => {
@@ -1274,6 +1276,54 @@
                     }
                 }
             });
+        }
+
+        function displayEmptyGraph() {
+            const ctx = document.createElement('canvas');
+            ctx.id = "emptyGraph";
+            document.getElementById("result").appendChild(ctx);
+        
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [], // No labels since there's no data
+                    datasets: [{
+                        label: 'No Data Available',
+                        data: [],
+                        borderColor: '#f4634c',
+                        backgroundColor: 'rgba(244, 99, 76, 0.2)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            },
+                            ticks: {
+                                display: true // Show x-axis
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Response Time (ms)'
+                            },
+                            ticks: {
+                                display: true // Show y-axis
+                            }
+                        }
+                    }
+                }
+            });
+        
+            const message = document.createElement('p');
+            message.innerHTML = "<strong>Create a participant ID freely to track your results over time!</strong>";
+            document.getElementById("result").appendChild(message);
         }
         
         function updateProgressBar() {
