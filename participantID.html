@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Participant ID</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-database-compat.min.js"></script>
+    <style>
+        body {
+            text-align: center;
+            font-family: 'Jost', Helvetica, sans-serif;
+            font-weight: 300;
+            background-color: #fbebdc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            color: #f4634c;
+            font-size: 24px;
+        }
+        .input-field {
+            width: 80%;
+            padding: 10px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 28px;
+            cursor: pointer;
+            border-radius: 2px;
+            background-color: #f4634c;
+            color: white;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #fba899;
+        }
+        #message {
+            margin-top: 20px;
+            color: #f44336; /* Red for error messages */
+        }
+    </style>
+</head>
+<body>
+    <h1>Create Participant ID</h1>
+    <input type="text" id="participantIdInput" class="input-field" placeholder="Enter your Participant ID">
+    <button id="submitButton">Submit</button>
+    <p id="message"></p>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhm0IyK-dy62fXrnaukA6tE5bJshT7_yg",
+            authDomain: "cognilabdata.firebaseapp.com",
+            databaseURL: "https://cognilabdata-default-rtdb.firebaseio.com",
+            projectId: "cognilabdata",
+            storageBucket: "cognilabdata.firebasestorage.app",
+            messagingSenderId: "377680448118",
+            appId: "1:377680448118:web:07d4f27f43df9054dc2d57",
+            measurementId: "G-VVL6RG6YHP"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const firebaseDb = firebase.database();
+
+        document.getElementById("submitButton").addEventListener("click", function() {
+            const participantId = document.getElementById("participantIdInput").value.trim();
+            const messageElement = document.getElementById("message");
+
+            // Validate the input
+            if (!participantId) {
+                messageElement.textContent = "Please enter a Participant ID.";
+                return;
+            }
+
+            // Check if the participant ID already exists
+            firebaseDb.ref('participantIDs').once('value').then(snapshot => {
+                const existingIDs = snapshot.val() || {};
+
+                if (existingIDs[participantId]) {
+                    messageElement.textContent = "This Participant ID already exists. Please choose a different one.";
+                } else {
+                    // Save the new Participant ID
+                    const newIdRef = firebaseDb.ref('participantIDs/' + participantId);
+                    newIdRef.set(true) // Using a simple value to mark existence
+                        .then(() => {
+                            messageElement.textContent = "Participant ID created successfully!";
+                            document.getElementById("participantIdInput").value = ''; // Clear input
+                        })
+                        .catch((error) => {
+                            console.error("Error saving Participant ID: ", error);
+                            messageElement.textContent = "Error saving Participant ID. Please try again.";
+                        });
+                }
+            }).catch(error => {
+                console.error("Error fetching Participant IDs: ", error);
+                messageElement.textContent = "Error checking Participant IDs. Please try again.";
+            });
+        });
+    </script>
+</body>
+</html>
