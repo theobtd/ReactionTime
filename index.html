@@ -1072,6 +1072,11 @@
                 ? alertingReactionTimes.reduce((acc, time) => acc + time, 0) / alertingReactionTimes.length
                 : 0;
         
+            // Calculate cumulative response time
+            const cumulativeResponseTime = reactionTimes.normal.congruent.concat(reactionTimes.normal.incongruent, 
+                reactionTimes.reversed.congruent, reactionTimes.reversed.incongruent)
+                .reduce((acc, time) => acc + time, 0);
+        
             const resultData = {
                 participantInfo: participantInfo,
                 testResults: {
