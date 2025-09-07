@@ -266,36 +266,10 @@
                 top: 20px;
             }
         }
-
-        #managementButton {
-            position: fixed;
-            top: 40px; /* Adjust as necessary */
-            right: 20px; /* Adjust as necessary */
-            font-family: 'Jost', Helvetica, sans-serif;
-            font-weight: 300;
-            font-size: 16px;
-            padding: 12px 20px;
-            cursor: pointer;
-            margin: 12px;
-            border-radius: 2px;
-            background-color: #4CAF50; /* Change color as needed */
-            color: white;
-            border: none;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: all 0.3s ease;
-        }
-        
-        #managementButton:hover {
-            background-color: #45a049; /* Darker shade for hover effect */
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
     </style>
 </head>
 <body>
     <h1>AetherisLab</h1>
-    <button id="managementButton">Management Report (mockup)</button>
     <button id="startButton">Begin Assessment</button>
     <div id="testExplanation">
         <p>The assessment is based on a clinically-validated methodology to detect cognitive disorders.      </p>
@@ -1251,10 +1225,6 @@
             let progress = (totalCompletedTrials / TOTAL_TRIALS) * 100;
             document.getElementById("progressBar").style.width = `${progress}%`;
         }
-
-        document.getElementById("managementButton").addEventListener("click", function() {
-            window.location.href = "management.html";
-        });
     </script>
 </body>
 </html>
