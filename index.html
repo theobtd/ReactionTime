@@ -1324,6 +1324,26 @@
             const message = document.createElement('p');
             message.innerHTML = "<strong>Create a participant ID freely to track your results over time!</strong>";
             document.getElementById("result").appendChild(message);
+        
+            // Create the button
+            const button = document.createElement('button');
+            button.innerText = "Create Participant ID";
+            button.style.marginTop = "10px"; // Add some margin for spacing
+            button.style.backgroundColor = "#f4634c"; // Match existing button color
+            button.style.color = "white"; // Match text color
+            button.style.border = "none"; // No border
+            button.style.borderRadius = "2px"; // Match border radius
+            button.style.padding = "12px 28px"; // Match padding
+            button.style.cursor = "pointer"; // Pointer cursor
+            button.style.fontFamily = "'Jost', Helvetica, sans-serif"; // Match font family
+            button.style.fontWeight = "300"; // Match font weight
+            button.style.fontSize = "16px"; // Match font size
+            button.onclick = function() {
+                window.location.href = "participantID.html"; // Redirect to participantID.html
+            };
+        
+            // Append the button to the result section
+            document.getElementById("result").appendChild(button);
         }
         
         function updateProgressBar() {
