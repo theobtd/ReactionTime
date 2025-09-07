@@ -1055,6 +1055,22 @@
             }
             toggleProgressBar(false);
 
+            let averageNormalCongruent = reactionTimes.normal.congruent.length > 0 
+                ? reactionTimes.normal.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.congruent.length 
+                : 0;
+            let averageNormalIncongruent = reactionTimes.normal.incongruent.length > 0
+                ? reactionTimes.normal.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.normal.incongruent.length
+                : 0;
+            let averageReversedCongruent = reactionTimes.reversed.congruent.length > 0
+                ? reactionTimes.reversed.congruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.congruent.length
+                : 0;
+            let averageReversedIncongruent = reactionTimes.reversed.incongruent.length > 0
+                ? reactionTimes.reversed.incongruent.reduce((acc, time) => acc + time, 0) / reactionTimes.reversed.incongruent.length
+                : 0;
+            let averageAlertingReactionTime = alertingReactionTimes.length > 0
+                ? alertingReactionTimes.reduce((acc, time) => acc + time, 0) / alertingReactionTimes.length
+                : 0;
+
             const resultData = {
                 participantInfo: participantInfo,
                 testResults: {
